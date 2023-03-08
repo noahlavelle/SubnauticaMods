@@ -17,7 +17,9 @@ namespace Seamoth
     {
         public static ManualLogSource Log = new("Seamoth");
         public static string ModFolderPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        
+        public static AssetBundle AssetBundle;
+
+        public static EquipmentType SeamothModuleType;
         public static ShipPrefab SeamothPrefab;
 
         public static readonly ShipDepthModuleMk1 ShipDepthModuleMk1 = new();
@@ -28,7 +30,7 @@ namespace Seamoth
         private static readonly ShipPerimeterDefenceModule ShipPerimeterDefenceModule = new();
         private static readonly ShipSolarChargerModule ShipSolarChargerModule = new();
         private static readonly ShipSonarModule ShipSonarModule = new();
-        private static readonly ShipSonarModule ShipStorageModule = new();
+        private static readonly ShipStorageModule ShipStorageModule = new();
         private static readonly ShipTorpedoModule ShipTorpedoModule = new();
 
         private static readonly List<ShipModuleBase> SeamothModules = new()
@@ -56,21 +58,18 @@ namespace Seamoth
         private static void PatchPrefabs()
         {
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.noahlavelle.seamoth");
-            
-            var seamothUpgradesIcon = LoadSprite(Path.Combine(ModFolderPath, "Assets", "SeamothTabIcon.png"));
-            CraftTreeHandler.AddTabNode(CraftTree.Type.Fabricator, "SeamothUpgrades", "Seamoth Upgrades", seamothUpgradesIcon, "Upgrades");
 
+            AssetBundle = AssetBundle.LoadFromFile(Path.Combine(ModFolderPath, "Assets", "seamoth"));
+
+            var seamothUpgradesIcon = AssetBundle.LoadAsset<Sprite>("SeamothTabIcon");
+            CraftTreeHandler.AddTabNode(CraftTree.Type.Fabricator, "SeamothUpgrades", "Seamoth Upgrades", seamothUpgradesIcon, "Upgrades");
+            
+            SeamothModuleType = EquipmentHandler.Main.AddEquipmentType("SeamothModule");
+            
             SeamothPrefab = new ShipPrefab("Seamoth", "Seamoth", "One-person sea-and-space vehicle");
             SeamothPrefab.Patch();
             
             SeamothModules.ForEach(module => module.Patch());
-        }
-
-        public static Sprite LoadSprite(string iconPath)
-        {
-            if (!File.Exists(iconPath)) return null;
-            var texture2D = ImageUtils.LoadTextureFromFile(iconPath);
-            return ImageUtils.LoadSpriteFromTexture(texture2D);
         }
     }
 }

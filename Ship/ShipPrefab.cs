@@ -1,19 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using Seamoth;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
 using UnityEngine;
+using UnityEditor;
 
 namespace Seamoth.Ship
 {
     public class ShipPrefab : Craftable
     {
-        public override string AssetsFolder => Path.Combine(base.AssetsFolder, "Assets");
+        public override string AssetsFolder => Path.Combine(Plugin.ModFolderPath, "Assets");
         
         public ShipPrefab(string classId, string friendlyName, string description) : base(classId, friendlyName,
             description)
@@ -29,6 +28,7 @@ namespace Seamoth.Ship
         {
             return new RecipeData
             {
+                craftAmount = 1,
                 Ingredients =  new List<Ingredient>()
                 {
                     new(TechType.TitaniumIngot, 1),
@@ -36,14 +36,27 @@ namespace Seamoth.Ship
                     new(TechType.Glass, 2),
                     new(TechType.Lubricant, 1),
                     new(TechType.Lead, 1)
-                },
-                craftAmount = 1
+                }
             };
+        }
+
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            var taskResult = new TaskResult<GameObject>();
+            yield return CraftData.InstantiateFromPrefabAsync(TechType.Exosuit, taskResult);
+            var prefab = taskResult.Get();
+
+            var techTag = prefab.GetComponent<TechTag>();
+            var prefabIdentifier = prefab.GetComponent<PrefabIdentifier>();
+
+            techTag.type = TechType;
+            prefabIdentifier.ClassId = ClassID;
+            gameObject.Set(prefab);
         }
 
         protected override Sprite GetItemSprite()
         {
-            return Plugin.LoadSprite(Path.Combine(AssetsFolder, "SeamothCraftIcon.png"));
+            return Plugin.AssetBundle.LoadAsset<Sprite>("SeamothCraftIcon");
         }
 
         public override TechCategory CategoryForPDA => TechCategory.Constructor;
@@ -51,5 +64,6 @@ namespace Seamoth.Ship
         public override string[] StepsToFabricatorTab => new[] { "Vehicles" };
         public override CraftTree.Type FabricatorType => CraftTree.Type.Constructor;
         public override bool UnlockedAtStart => true;
-    }  
+        public override float CraftingTime => 15f;
+    }
 }

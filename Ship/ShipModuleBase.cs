@@ -13,7 +13,6 @@ namespace Seamoth.Ship;
 public abstract class ShipModuleBase : Equipable
 {
     private readonly string _assetName;
-    public override string AssetsFolder => Path.Combine(Plugin.ModFolderPath, "Assets", "Modules");
 
     public ShipModuleBase(string classId, string friendlyName, string assetName, string description) : base(
         classId, friendlyName, description
@@ -38,10 +37,11 @@ public abstract class ShipModuleBase : Equipable
 
     protected override Sprite GetItemSprite()
     {
-        return Plugin.LoadSprite(Path.Combine(AssetsFolder, String.Concat(_assetName, ".png")));
+        return Plugin.AssetBundle.LoadAsset<Sprite>(_assetName);
     }
     
-    public override EquipmentType EquipmentType => EquipmentType.VehicleModule;
+    public override EquipmentType EquipmentType => Plugin.SeamothModuleType;
+    public override QuickSlotType QuickSlotType => QuickSlotType.Passive;
     public override TechType RequiredForUnlock => Plugin.SeamothPrefab.TechType;
     public override bool UnlockedAtStart => true;
 }
