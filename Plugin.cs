@@ -20,6 +20,7 @@ namespace Seamoth
         public static AssetBundle AssetBundle;
 
         public static EquipmentType SeamothModuleType;
+        public static PingType SeamothPingType;
         public static ShipPrefab SeamothPrefab;
 
         public static readonly ShipDepthModuleMk1 ShipDepthModuleMk1 = new();
@@ -63,6 +64,9 @@ namespace Seamoth
 
             var seamothUpgradesIcon = AssetBundle.LoadAsset<Sprite>("SeamothTabIcon");
             CraftTreeHandler.AddTabNode(CraftTree.Type.Fabricator, "SeamothUpgrades", "Seamoth Upgrades", seamothUpgradesIcon, "Upgrades");
+
+            var seamothPingIcon = AssetBundle.LoadAsset<Sprite>("SeamothTabIcon");
+            SeamothPingType = PingHandler.RegisterNewPingType("Seamoth", seamothPingIcon);
             
             SeamothModuleType = EquipmentHandler.Main.AddEquipmentType("SeamothModule");
             
