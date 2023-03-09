@@ -6,6 +6,7 @@ namespace Seamoth.Ship.Modules;
 public class ShipDepthModuleMk3 : ShipModuleBase
 {
     public ShipDepthModuleMk3() : base(
+        new ShipModuleCraftType(CraftTree.Type.Workbench, TechCategory.Workbench, TechGroup.Workbench),
         "SeamothDepthModuleMK3",
         "Seamoth Depth Module MK3",
         "SeamothDepthModule",
@@ -28,8 +29,4 @@ public class ShipDepthModuleMk3 : ShipModuleBase
             }
         };
     }
-    
-    public override TechCategory CategoryForPDA => TechCategory.Workbench;
-    public override TechGroup GroupForPDA => TechGroup.Workbench;
-    public override CraftTree.Type FabricatorType => CraftTree.Type.Workbench;
 }

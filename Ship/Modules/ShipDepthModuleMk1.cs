@@ -6,6 +6,7 @@ namespace Seamoth.Ship.Modules;
 public class ShipDepthModuleMk1 : ShipModuleBase
 {
     public ShipDepthModuleMk1() : base(
+        new ShipModuleCraftType(CraftTree.Type.Fabricator, TechCategory.VehicleUpgrades, TechGroup.VehicleUpgrades),
         "SeamothDepthModuleMK1",
         "Seamoth Depth Module MK1",
         "SeamothDepthModule",
@@ -27,9 +28,4 @@ public class ShipDepthModuleMk1 : ShipModuleBase
             }
         };
     }
-    
-    public override TechCategory CategoryForPDA => TechCategory.VehicleUpgrades;
-    public override TechGroup GroupForPDA => TechGroup.VehicleUpgrades;
-    public override string[] StepsToFabricatorTab => new[] { "Upgrades", "SeamothUpgrades" };
-    public override CraftTree.Type FabricatorType => CraftTree.Type.Fabricator;
 }

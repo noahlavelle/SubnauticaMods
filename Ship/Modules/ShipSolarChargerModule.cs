@@ -6,6 +6,7 @@ namespace Seamoth.Ship.Modules;
 public class ShipSolarChargerModule : ShipModuleBase
 {
     public ShipSolarChargerModule() : base(
+        new ShipModuleCraftType(CraftTree.Type.Fabricator, TechCategory.VehicleUpgrades, TechGroup.VehicleUpgrades),
         "SeamothSolarChargerModule",
         "Seamoth Solar Charger",
         "SeamothSolarChargerModule",
@@ -27,9 +28,4 @@ public class ShipSolarChargerModule : ShipModuleBase
             }
         };
     }
-    
-    public override TechCategory CategoryForPDA => TechCategory.VehicleUpgrades;
-    public override TechGroup GroupForPDA => TechGroup.VehicleUpgrades;
-    public override string[] StepsToFabricatorTab => new[] { "Upgrades", "SeamothUpgrades" };
-    public override CraftTree.Type FabricatorType => CraftTree.Type.Fabricator;
 }

@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+﻿using System.Collections;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace Seamoth.Ship;
 
 public abstract class ShipModuleBase : Equipable
 {
+    private readonly ShipModuleCraftType _craftType;
     private readonly string _assetName;
 
-    public ShipModuleBase(string classId, string friendlyName, string assetName, string description) : base(
+    protected ShipModuleBase(ShipModuleCraftType craftType, string classId, string friendlyName, string assetName, string description) : base(
         classId, friendlyName, description
     )
     {
+        _craftType = craftType;
         _assetName = assetName;
     }
 
@@ -43,5 +39,19 @@ public abstract class ShipModuleBase : Equipable
     public override EquipmentType EquipmentType => Plugin.SeamothModuleType;
     public override QuickSlotType QuickSlotType => QuickSlotType.Passive;
     public override TechType RequiredForUnlock => Plugin.SeamothPrefab.TechType;
+    
+    public override CraftTree.Type FabricatorType => _craftType.FabricatorType;
+    public override TechCategory CategoryForPDA => _craftType.CategoryForPda;
+    public override TechGroup GroupForPDA => _craftType.GroupForPda;
+    public override string[] StepsToFabricatorTab
+    {
+        get
+        {
+            return _craftType.FabricatorType == CraftTree.Type.Fabricator 
+                ? new[] {"Upgrades", "SeamothUpgrades"}
+                : null;
+        }
+    }
+
     public override bool UnlockedAtStart => true;
 }

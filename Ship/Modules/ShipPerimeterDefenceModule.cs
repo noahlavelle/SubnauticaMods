@@ -6,6 +6,7 @@ namespace Seamoth.Ship.Modules;
 public class ShipPerimeterDefenceModule : ShipModuleBase
 {
     public ShipPerimeterDefenceModule() : base(
+        new ShipModuleCraftType(CraftTree.Type.Fabricator, TechCategory.VehicleUpgrades, TechGroup.VehicleUpgrades),
         "SeamothPerimeterDefenceModule",
         "Seamoth Perimeter Defence System",
         "SeamothPerimeterDefenceModule",
@@ -27,9 +28,4 @@ public class ShipPerimeterDefenceModule : ShipModuleBase
             }
         };
     }
-    
-    public override TechCategory CategoryForPDA => TechCategory.VehicleUpgrades;
-    public override TechGroup GroupForPDA => TechGroup.VehicleUpgrades;
-    public override string[] StepsToFabricatorTab => new[] { "Upgrades", "SeamothUpgrades" };
-    public override CraftTree.Type FabricatorType => CraftTree.Type.Fabricator;
 }

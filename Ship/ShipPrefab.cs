@@ -12,15 +12,14 @@ namespace Seamoth.Ship
 {
     public class ShipPrefab : Craftable
     {
+        private static GameObject _prefab;
+        
         public override string AssetsFolder => Path.Combine(Plugin.ModFolderPath, "Assets");
         
         public ShipPrefab(string classId, string friendlyName, string description) : base(classId, friendlyName,
             description)
         {
-            OnFinishedPatching += () =>
-            {
-                KnownTechHandler.SetAnalysisTechEntry(TechType, Array.Empty<TechType>());
-            };
+            
         }
 
 
@@ -42,16 +41,36 @@ namespace Seamoth.Ship
 
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-            var taskResult = new TaskResult<GameObject>();
-            yield return CraftData.InstantiateFromPrefabAsync(TechType.Exosuit, taskResult);
-            var prefab = taskResult.Get();
+            // Skip loading if the prefab is already cached
+            if (_prefab != null)
+            {
+                // Load seamoth model
+                _prefab = Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab");
 
-            var techTag = prefab.GetComponent<TechTag>();
-            var prefabIdentifier = prefab.GetComponent<PrefabIdentifier>();
+                // Set essential prefab properties
+                _prefab.AddComponent<TechTag>().type = TechType;
+                _prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
+            
+                //Spawn a seatruck for reference.
+                var seamothTask = CraftData.GetPrefabForTechTypeAsync(TechType.SeaTruck);
+                yield return seamothTask;
+                var seamothRef = seamothTask.GetResult();
+                
+                // Prevents vehicle disappearance when out of range
+                var largeWorldEntity = _prefab.AddComponent<LargeWorldEntity>();
+                largeWorldEntity.cellLevel = LargeWorldEntity.CellLevel.Global;
+                
+                // Add a ping
+                var ping = _prefab.AddComponent<PingInstance>();
+                ping.pingType = Plugin.SeamothPingType;
+                ping.origin = _prefab.FindChild("PingOrigin").transform;
+                
+                //Unload the prefab to save on resources.
+                Resources.UnloadAsset(seamothRef);
+            }
 
-            techTag.type = TechType;
-            prefabIdentifier.ClassId = ClassID;
-            gameObject.Set(prefab);
+            gameObject.Set(_prefab);
+            
         }
 
         protected override Sprite GetItemSprite()
