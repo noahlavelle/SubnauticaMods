@@ -61,18 +61,19 @@
       <HintPath>D:\SteamLibrary\steamapps\common\SubnauticaZero\QMods\SMLHelper_BZ\SMLHelper.dll</HintPath>
     </Reference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Helper" />
+  </ItemGroup>
 
   <Target Name="MoveToModFolder" AfterTargets="Build">
     <ItemGroup>
-      <_FilesToCopy Include="$(OutputPath)\Seamoth.dll"/>
+      <_FilesToCopy Include="$(OutputPath)\Seamoth.dll" />
     </ItemGroup>
-    <Message Text="_FilesToCopy: @(_FilesToCopy)" Importance="high"/>
+    <Message Text="_FilesToCopy: @(_FilesToCopy)" Importance="high" />
 
-    <Message Text="DestFiles:
-        @(_FilesToCopy->'$(_OutputCopyLocation)%(RecursiveDir)%(Filename)%(Extension)')" Importance="high"/>
+    <Message Text="DestFiles:&#xD;&#xA;        @(_FilesToCopy->'$(_OutputCopyLocation)%(RecursiveDir)%(Filename)%(Extension)')" Importance="high" />
 
-    <Copy SourceFiles="@(_FilesToCopy)"
-          DestinationFiles=
-                  "@(_FilesToCopy->'$(_OutputCopyLocation)%(RecursiveDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="@(_FilesToCopy)" DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 </Project>

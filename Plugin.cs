@@ -65,7 +65,7 @@ namespace Seamoth
             var seamothUpgradesIcon = AssetBundle.LoadAsset<Sprite>("SeamothTabIcon");
             CraftTreeHandler.AddTabNode(CraftTree.Type.Fabricator, "SeamothUpgrades", "Seamoth Upgrades", seamothUpgradesIcon, "Upgrades");
 
-            var seamothPingIcon = AssetBundle.LoadAsset<Sprite>("SeamothTabIcon");
+            var seamothPingIcon = AssetBundle.LoadAsset<Sprite>("SeamothPingIcon");
             SeamothPingType = PingHandler.RegisterNewPingType("Seamoth", seamothPingIcon);
             
             SeamothModuleType = EquipmentHandler.Main.AddEquipmentType("SeamothModule");
