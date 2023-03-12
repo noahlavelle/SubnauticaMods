@@ -62,7 +62,7 @@ namespace Seamoth
 
             AssetBundle = AssetBundle.LoadFromFile(Path.Combine(ModFolderPath, "Assets", "seamoth"));
 
-            var seamothUpgradesIcon = AssetBundle.LoadAsset<Sprite>("SeamothTabIcon");
+            var seamothUpgradesIcon = AssetBundle.LoadAsset<Sprite>("SeamothCraftIcon");
             CraftTreeHandler.AddTabNode(CraftTree.Type.Fabricator, "SeamothUpgrades", "Seamoth Upgrades", seamothUpgradesIcon, "Upgrades");
 
             var seamothPingIcon = AssetBundle.LoadAsset<Sprite>("SeamothPingIcon");
