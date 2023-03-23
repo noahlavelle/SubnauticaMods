@@ -17,11 +17,20 @@ public class VehicleDockable : VehicleComponent
 
     public override void AddComponent(ModVehicle parentVehicle)
     {
+        var vehiclePhysics = parentVehicle.GetVehicleComponentOfType<VehiclePhysics>();
+        if (vehiclePhysics == null)
+        {
+            Plugin.Log.LogError("VehicleDocking requires VehiclePhysics component");
+            return;
+        }
+
         var dockable = parentVehicle.Prefab.AddComponent<Dockable>();
-        dockable.rb = parentVehicle.Rigidbody;
+        dockable.rb = vehiclePhysics.Rigidbody;
         dockable.vehicle = parentVehicle.VehicleBehaviour;
         
         _colorCustomizer = parentVehicle.Prefab.AddComponent<ColorCustomizer>();
         _colorCustomizer.isBase = false;
+
+        parentVehicle.VehicleBehaviour.dockable = dockable;
     }
 }

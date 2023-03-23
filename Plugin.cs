@@ -21,11 +21,12 @@ namespace VehicleFramework
         private void Awake()
         {
             Log = Logger;
+            Vehicles = new Dictionary<TechType, ModVehicle>();
+            
             AssetBundle = AssetBundle.LoadFromFile(Path.Combine(ModFolderPath, "Assets", "seamoth"));
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.noahlavelle.seamoth");
             
-            var SeamothPrefab = new Seamoth.Seamoth();
-            SeamothPrefab.Patch();
+            var _ = new Seamoth.Seamoth();
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }

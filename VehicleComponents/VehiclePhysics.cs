@@ -4,18 +4,27 @@ namespace VehicleFramework.VehicleComponents;
 
 public class VehiclePhysics : VehicleComponent
 {
+    public Rigidbody Rigidbody;
+    
+    private string _collisionPath;
+    
+    public VehiclePhysics(string collisionPath = "Collision")
+    {
+        _collisionPath = collisionPath;
+    }
+    
     public override void AddComponent(ModVehicle parentVehicle)
     {
-        var rigidbody = parentVehicle.Prefab.AddComponent<Rigidbody>();
-        rigidbody.mass = 800;
-        rigidbody.useGravity = false;
-        rigidbody.drag = 2;
-        rigidbody.angularDrag = 4;
+        Rigidbody = parentVehicle.Prefab.AddComponent<Rigidbody>();
+        Rigidbody.mass = 800;
+        Rigidbody.useGravity = false;
+        Rigidbody.drag = 2;
+        Rigidbody.angularDrag = 4;
 
-        parentVehicle.VehicleBehaviour.useRigidbody = rigidbody;
+        parentVehicle.VehicleBehaviour.useRigidbody = Rigidbody;
 
         var worldForces = parentVehicle.Prefab.AddComponent<WorldForces>();
-        worldForces.useRigidbody = rigidbody;
+        worldForces.useRigidbody = Rigidbody;
         worldForces.underwaterGravity = 0;
         worldForces.aboveWaterGravity = 9.81f;
         worldForces.waterDepth = -5f;
@@ -30,5 +39,7 @@ public class VehiclePhysics : VehicleComponent
 
         var constructionObstacle = parentVehicle.Prefab.AddComponent<ConstructionObstacle>();
         constructionObstacle.reason = "VehicleObstacle";
+
+        parentVehicle.VehicleBehaviour.collisionModel = parentVehicle.Prefab.transform.Find(_collisionPath).gameObject;
     }
 }

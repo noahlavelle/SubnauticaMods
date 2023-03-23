@@ -9,14 +9,13 @@ public class Seamoth : ModVehicle
 {
     public Seamoth() : base("Seamoth", "Seamoth", "One-person sea-and-space vehicle", Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab.prefab"))
     {
-        // AddVehicleComponent(new VehicleLiveMixin(200, -1, true, true, 70, 0.2f, false));
+        AddVehicleComponent(new VehicleLiveMixin(200, -1, true, true, 70, 0.2f, false));
         AddVehicleComponent(new VehicleEnergyManager());
         
-        AddVehicleComponent(new VehicleName());
+        AddVehicleComponent(new VehiclePhysics());
         AddVehicleComponent(new VehicleLights());
         AddVehicleComponent(new VehicleConstructionVFX());
-        AddVehicleComponent(new VehicleSeat());
-        AddVehicleComponent(new VehiclePhysics());
+        AddVehicleComponent(new VehicleSeat(true));
         AddVehicleComponent(new VehicleEcoTarget());
         AddVehicleComponent(new VehicleDockable("seamoth_docked", new Vector3(0, 0.8822327f, -0.07598901f)));
         AddVehicleComponent(new VehiclePing(Plugin.AssetBundle.LoadAsset<Sprite>("SeamothPingIcon")));
@@ -51,6 +50,17 @@ public class Seamoth : ModVehicle
             "seamoth_loop_rpm"
         ));
         
+        AddVehicleComponent(new VehicleCustomisation(
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Exterior_geo", 0),
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Exterior_geo", 1),
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Interior_geo", 1),
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Hatch_Exterior_geo", 0),
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/UpgradeSlot_Hatch_geo", 0),
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Flap_L_geo", 0),
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Flap_R_geo", 0),
+            new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Engine_PowerSlot_geo", 0)
+        ));
+
         var storageOpen = AssetManager.LoadFmodAsset(
             "event:/sub/seamoth/storage_open",
             "{b2821359-928c-4780-876a-0957de85f193}",
@@ -73,7 +83,7 @@ public class Seamoth : ModVehicle
 
     protected override void PrefabConstructionInitialised()
     {
-        AddVehicleBehaviour<ModVehicleBehaviour>();
+        AddVehicleBehaviour<SeamothBehaviour>();
     }
 
     public override Sprite ItemSprite => Plugin.AssetBundle.LoadAsset<Sprite>("SeamothCraftIcon");

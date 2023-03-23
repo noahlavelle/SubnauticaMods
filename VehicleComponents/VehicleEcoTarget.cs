@@ -16,5 +16,7 @@ public class VehicleEcoTarget : VehicleComponent
         CreatureUtils.setupEcoTarget = true;
         CreatureUtils.setupEcoBehaviours = false;
         CreatureUtils.addedComponents = new Component[] { EcoTarget };
+
+        parentVehicle.VehicleBehaviour.ecoTarget = EcoTarget;
     }
 }

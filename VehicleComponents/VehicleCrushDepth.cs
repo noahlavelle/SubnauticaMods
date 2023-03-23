@@ -33,7 +33,7 @@ public class VehicleCrushDepth : VehicleComponent
         var vehicleConfig = parentVehicle.GetVehicleComponentOfType<VehicleLiveMixin>();
         if (vehicleConfig == null)
         {
-            Plugin.Log.LogError("VehicleCrushDepth requires a VehicleConfig");
+            Plugin.Log.LogError("VehicleCrushDepth requires a VehicleLiveMixin component");
             return;
         }
         
@@ -59,10 +59,14 @@ public class VehicleCrushDepth : VehicleComponent
         crushDamage.crushPeriod = _crushDepthConfig.CrushPeriod;
         crushDamage.soundOnDamage = crushDamageEmitter;
 
+        parentVehicle.VehicleBehaviour.crushDamage = crushDamage;
+
         var depthAlarms = parentVehicle.Prefab.AddComponent<DepthAlarms>();
         depthAlarms.crushDamage = crushDamage;
         depthAlarms.crushDepthNotification = crushDamageNotification;
         depthAlarms.conditionRules = parentVehicle.Prefab.AddComponent<ConditionRules>();
+
+        parentVehicle.VehicleBehaviour.depthAlarms = depthAlarms;
     }
 
     public class VehicleCrushDepthConfig

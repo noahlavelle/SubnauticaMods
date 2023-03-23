@@ -43,6 +43,8 @@ public class VehicleLiveMixin : VehicleComponent
 
         LiveMixin.data = LiveMixinData;
 
+        parentVehicle.VehicleBehaviour.liveMixin = LiveMixin;
+
         TemperatureDamage.liveMixin = LiveMixin;
         TemperatureDamage.minDamageTemperature = _temperatureDamageMinimum;
         TemperatureDamage.baseDamagePerSecond = _temperatureDps;

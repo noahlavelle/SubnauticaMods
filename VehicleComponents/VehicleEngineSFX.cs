@@ -41,5 +41,7 @@ public class VehicleEngineSFX : VehicleComponent
         engineRpmManager.rampDownSpeed = 0.5f;
         engineRpmManager.engineRevUp = engineRevUpEmitter;
         engineRpmManager.engineRpmSFX = engineLoopingEmitter;
+
+        parentVehicle.VehicleBehaviour.EngineRpmSfxManager = engineRpmManager;
     }
 }

@@ -23,6 +23,9 @@ public abstract class ModVehicle : Craftable
     {
         VehicleComponents = new List<VehicleComponent>();
         _vehicleModel = model;
+        
+        Patch();
+        Plugin.Vehicles.Add(TechType, this);
     }
 
     public T AddVehicleBehaviour<T>() where T : ModVehicleBehaviour, new()
@@ -53,7 +56,7 @@ public abstract class ModVehicle : Craftable
     {
         if (ReferencePrefab == null)
         {
-            var referenceTask = CraftData.GetPrefabForTechTypeAsync(TechType.Exosuit);
+            var referenceTask = CraftData.GetPrefabForTechTypeAsync(TechType.SeaTruck);
             yield return referenceTask;
             ReferencePrefab = referenceTask.GetResult();
         }
@@ -91,8 +94,7 @@ public abstract class ModVehicle : Craftable
 
     private void ApplyMarmosetMaterial()
     {
-        var marmosetShader = ReferencePrefab.transform.Find("exosuit_01/exosuit_body_geo")
-            .GetComponent<Renderer>().material.shader;
+        var marmosetShader = ReferencePrefab.transform.Find("model/seatruck_anim/Seatruck_cabin_hatch_interior_geo").GetComponent<Renderer>().material.shader;
         foreach (var renderer in Prefab.GetComponentsInChildren<Renderer>())
         {
             foreach (var material in renderer.materials)

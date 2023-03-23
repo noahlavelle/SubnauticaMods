@@ -45,30 +45,9 @@ public class VehicleUpgradeConsole : VehicleComponent
         upgradeConsoleInput.dockType = Vehicle.DockType.Base;
         upgradeConsoleInput.interactText = "UpgradeConsole";
         upgradeConsoleInput.flap = parentVehicle.Prefab.transform.Find(_upgradeConsoleFlapPath);
-        
-        // upgradeConsoleInput.slots = new[]
-        // {
-        //     new VehicleUpgradeConsoleInput.Slot
-        //     {
-        //         id = "SeamothModule1",
-        //         model = parentVehicle.Prefab.transform.Find("Model/VehicleAnim/UpgradeSlot_1_geo").gameObject
-        //     },
-        //     new VehicleUpgradeConsoleInput.Slot
-        //     {
-        //         id = "SeamothModule2",
-        //         model = parentVehicle.Prefab.transform.Find("Model/VehicleAnim/UpgradeSlot_2_geo").gameObject
-        //     },
-        //     new VehicleUpgradeConsoleInput.Slot
-        //     {
-        //         id = "SeamothModule3",
-        //         model = parentVehicle.Prefab.transform.Find("Model/VehicleAnim/UpgradeSlot_3_geo").gameObject
-        //     },
-        //     new VehicleUpgradeConsoleInput.Slot
-        //     {
-        //         id = "SeamothModule4",
-        //         model = parentVehicle.Prefab.transform.Find("Model/VehicleAnim/UpgradeSlot_4_geo").gameObject
-        //     }
-        // };
+        upgradeConsoleInput.animatorParamOpen = "";
+        upgradeConsoleInput.anglesOpened = new Vector3(-180, -90, 90);
+        upgradeConsoleInput.anglesClosed = new Vector3(-90, -90, 90);
 
         parentVehicle.VehicleBehaviour.modulesRoot = upgradeModulesRootIdentifier;
         parentVehicle.VehicleBehaviour.upgradesInput = upgradeConsoleInput;
