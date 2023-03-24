@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.UIElements;
 using VehicleFramework.VehicleComponents;
 
 namespace VehicleFramework.Patchers;
@@ -49,5 +50,29 @@ public class MoonpoolPatcher
         ___dockingEndPos.localPosition = customDockable.DockingEndPoint;
         dockable.transform.position = Vector3.Lerp(___startPosition, ___dockingEndPos.position, interpfraction);
         dockable.transform.rotation = Quaternion.Lerp(___startRotation, ___dockingEndPos.rotation, interpfraction);
+    }
+
+    /**
+     * Vehicles repeatedly undock then dock. This mirrors the SeaTruckRedockLock class
+    */
+    [HarmonyPrefix, HarmonyPatch("OnTriggerEnter")]
+    static bool OnTriggerEnterPrefix(Collider other)
+    {
+        var entityRoot = UWE.Utils.GetEntityRoot(other.gameObject);
+        if (!entityRoot)
+        {
+            entityRoot = other.gameObject;
+        }
+        
+        var redockLock = entityRoot.GetComponent<VehicleDockable.VehicleRedockLock>();
+        if (redockLock == null) return true;
+        return !redockLock.IsLocked();
+    }
+
+    [HarmonyPostfix, HarmonyPatch("LockSeatruckRedocking")]
+    static void LockVehicleRedocking(Dockable ____dockedObject, VehicleDockingBay __instance)
+    {
+        var redockLock = ____dockedObject.gameObject.GetComponent<VehicleDockable.VehicleRedockLock>();
+        redockLock.Lock(__instance);
     }
 }
