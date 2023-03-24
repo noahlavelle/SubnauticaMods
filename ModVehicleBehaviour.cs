@@ -35,11 +35,11 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
     
     public override Vector3[] vehicleDefaultColors => new Vector3[5]
     {
-        new Vector3(0f, 0f, 1f),
-        new Vector3(0f, 0f, 0f),
-        new Vector3(0f, 0f, 1f),
-        new Vector3(0.577f, 0.447f, 0.604f),
-        new Vector3(0.114f, 0.729f, 0.965f)
+        new(0f, 0f, 1f),
+        new(0f, 0f, 0f),
+        new(0f, 0f, 1f),
+        new(0.577f, 0.447f, 0.604f),
+        new(0.114f, 0.729f, 0.965f)
     };
 
 
@@ -53,8 +53,14 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
         base.Start();
 
         mainAnimator = transform.GetComponentInChildren<Animator>();
+        
+        // Apply vehicle config
         controlSheme = ControlScheme;
         stabilizeRoll = true;
+        forwardForce = ForwardForce;
+        backwardForce = BackwardForce;
+        sidewardForce = SidewardForce;
+        verticalForce = VerticalForce;
 
         var light = transform.GetComponentInChildren<Light>();
         if (light != null)
@@ -103,6 +109,7 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
 
     public override void SetPlayerInside(bool inside)
     {
+        base.SetPlayerInside(inside);
         UWE.Utils.SetIsKinematicAndUpdateInterpolation(useRigidbody, isKinematic: false);
         PlayerFullyEntered = inside;
     }
@@ -218,4 +225,8 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
     protected abstract string EnterVehicleText { get; }
     protected abstract ControlSheme ControlScheme { get; }
     protected abstract float EnergyConsumptionRate { get;  }
+    protected abstract float ForwardForce { get; }
+    protected abstract float BackwardForce { get; }
+    protected abstract float SidewardForce { get; }
+    protected abstract float VerticalForce { get; }
 }

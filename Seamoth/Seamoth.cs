@@ -30,16 +30,12 @@ public class Seamoth : ModVehicle
         ));
         
         AddVehicleComponent(
-            new VehicleVoice(new VehicleVoiceLine(
+            new VehicleSounds(new VehicleVoiceLine(
                     "event:/sub/seamoth/welcome",
                 "{d1db5c9b-4953-4ee7-ae98-fcc72347bf10}",
                 "seamoth-welcome",
                 "Seamoth: Welcome aboard, captain"
-            ),
-            "{15dc7344-7b0a-4ffd-9b5c-c40f923e4f4d}", 
-            "event:/sub/seamoth/impact_solid_soft", 
-            "impact_solid_soft"
-        ));
+            )));
         
         AddVehicleComponent(new VehicleEngineSFX(
             "event:/sub/seamoth/seamoth_rev_up",
