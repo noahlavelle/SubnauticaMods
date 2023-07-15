@@ -1,9 +1,10 @@
-﻿using mset;
+﻿using Mono.Cecil;
+using mset;
 using UnityEngine;
 
 namespace VehicleFramework;
 
-public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, IInteriorSpace, IHandTarget
+public abstract class ModVehicleBehaviour : Vehicle, IInteriorSpace, IHandTarget
 {
     private bool _playerFullyEntered;
     private Color _lightColor;
@@ -42,12 +43,6 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
         new(0.114f, 0.729f, 0.965f)
     };
 
-
-    public virtual string GetProfileTag()
-    {
-        return "Vehicle";
-    }
-
     public override void Start()
     {
         base.Start();
@@ -72,7 +67,7 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
     public override void Update()
     {
         base.Update();
-
+        
         UpdateSounds();
         
         if (GetPilotingMode())
@@ -106,11 +101,19 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
     {
         return !FPSInputModule.current.lockMovement && IsPowered();
     }
+    
+    public override void EnterVehicle(Player player, bool teleport, bool playEnterAnimation = true)
+    {
+        base.EnterVehicle(player, teleport, playEnterAnimation);
+        if (!playEnterAnimation)
+        {
+            PlayerFullyEntered = true;
+        }
+    }
 
     public override void SetPlayerInside(bool inside)
     {
         base.SetPlayerInside(inside);
-        UWE.Utils.SetIsKinematicAndUpdateInterpolation(useRigidbody, isKinematic: false);
         PlayerFullyEntered = inside;
     }
 
@@ -118,21 +121,24 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
     {
         base.OnPilotModeBegin();
         UWE.Utils.EnterPhysicsSyncSection();
-        UWE.Utils.SetIsKinematicAndUpdateInterpolation(useRigidbody, isKinematic: false);
-        
         Player.main.EnterInterior(this);
-        SetPlayerInside(true);
         PlatformUtils.SetLightBarColor(_lightColor);
+        Player.main.armsController.SetWorldIKTarget(leftHandPlug, rightHandPlug);
+        UWE.Utils.SetIsKinematicAndUpdateInterpolation(useRigidbody, isKinematic: false);
     }
     
     public override void OnPilotModeEnd()
     {
         base.OnPilotModeEnd();
         UWE.Utils.ExitPhysicsSyncSection();
-        Player.main.inSeamoth = false;
-        PlayerFullyEntered = false;
+        Player.main.armsController.SetWorldIKTarget(null, null);
+        mainAnimator.SetBool("player_in", false);
         Player.main.ExitCurrentInterior();
         PlatformUtils.ResetLightBarColor();
+        if (movePlayerComp != null)
+        {
+            movePlayerComp.BeginMove();
+        }
     }
     
     // Override nonfunctional default behaviour
@@ -150,13 +156,6 @@ public abstract class ModVehicleBehaviour : Vehicle, IScheduledUpdateBehaviour, 
         EnterVehicle(hand.player, teleport: true);
     }
 
-
-    public void ScheduledUpdate()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public int scheduledUpdateIndex { get; set; }
     public void SetPlayerInsideState(bool state) { }
 
     public bool IsPlayerInside()

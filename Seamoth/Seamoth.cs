@@ -17,7 +17,6 @@ public class Seamoth : ModVehicle
         AddVehicleComponent(new VehicleConstructionVFX());
         AddVehicleComponent(new VehicleSeat(true));
         AddVehicleComponent(new VehicleEcoTarget());
-        AddVehicleComponent(new VehicleDockable("seamoth_docked", new Vector3(0, 0.8822327f, -0.07598901f)));
         AddVehicleComponent(new VehiclePing(Plugin.AssetBundle.LoadAsset<Sprite>("SeamothPingIcon")));
         AddVehicleComponent(new VehicleCrushDepth(
             new VehicleCrushDepth.VehicleCrushDepthConfig(200f, 20f, 3f),
@@ -55,6 +54,15 @@ public class Seamoth : ModVehicle
             new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Flap_L_geo", 0),
             new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Flap_R_geo", 0),
             new VehicleCustomisation.ColorData("Model/Vehicle_Anim/Engine_PowerSlot_geo", 0)
+        ));
+        
+        AddVehicleComponent(new VehicleDockable(
+            new Vector3(0, 0, 0),
+            Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_dock"),
+            Plugin.AssetBundle.LoadAsset<AnimationClip>("loop_seamoth_docked"),
+            Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_left"),
+            Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_right"),
+            Plugin.AssetBundle.LoadAsset<AnimationClip>("player_view_moon_seamoth_dock")
         ));
 
         var storageOpen = AssetManager.LoadFmodAsset(

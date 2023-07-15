@@ -1,19 +1,36 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace VehicleFramework.VehicleComponents;
 
 public class VehicleDockable : VehicleComponent
 {
-    public readonly string AnimationName;
     public readonly Vector3 DockingEndPoint;
+    public readonly AnimatorOverrideController OverrideController;
+    public AnimatorOverrideController PlayerOverrideController;
+    
+    public readonly AnimationClip DockingAnimation;
+    public readonly AnimationClip DockingLoopAnimation;
+    public readonly AnimationClip LaunchLeftAnimation;
+    public readonly AnimationClip LaunchRightAnimation;
+    public readonly AnimationClip PlayerDockingAnimation;
+
     private ColorCustomizer _colorCustomizer;
     private float _dockingUnlockDistance;
 
-    public VehicleDockable(string animationName, Vector3 dockingEndPoint, float dockingUnlockDistance = 5)
+    public VehicleDockable(Vector3 dockingEndPoint, AnimationClip dockingAnimation, AnimationClip dockingLoopAnimation, AnimationClip launchLeftAnimation, AnimationClip launchRightAnimation, AnimationClip playerDockingAnimation, float dockingUnlockDistance = 5)
     {
-        AnimationName = animationName;
         DockingEndPoint = dockingEndPoint;
+        DockingAnimation = dockingAnimation;
+        DockingLoopAnimation = dockingLoopAnimation;
+        LaunchLeftAnimation = launchLeftAnimation;
+        LaunchRightAnimation = launchRightAnimation;
+        PlayerDockingAnimation = playerDockingAnimation;
         _dockingUnlockDistance = dockingUnlockDistance;
+
+        OverrideController = new AnimatorOverrideController();
+        PlayerOverrideController = new AnimatorOverrideController();
     }
 
     public override void AddComponent(ModVehicle parentVehicle)
@@ -36,6 +53,17 @@ public class VehicleDockable : VehicleComponent
 
         var redockLock = parentVehicle.Prefab.AddComponent<VehicleRedockLock>();
         redockLock.unlockDistance = _dockingUnlockDistance;
+
+        PlayerOverrideController.runtimeAnimatorController = Player.main.playerAnimator.runtimeAnimatorController;
+
+        var playerDockAnimationOriginal =
+        Player.main.playerAnimator.runtimeAnimatorController.animationClips.First(a =>
+            a.name == "player_seatruck_moonpool_dock");
+
+        PlayerOverrideController.ApplyOverrides(new List<KeyValuePair<AnimationClip, AnimationClip>>
+        {
+            new(playerDockAnimationOriginal, PlayerDockingAnimation)
+        });
     }
 
     public class VehicleRedockLock : MonoBehaviour
