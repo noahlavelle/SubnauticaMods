@@ -56,7 +56,7 @@ public class Plugin : BaseUnityPlugin
 public class SeaMoth : BaseVehiclePrefab
 {
     public override string ClassID => "seamothmod";
-    public override string DisplayName => "Seamoth";
+    public override string DisplayName => "Alterra Seamoth";
     public override string Description => "Desc";
     public override float CraftTime => 20f;
     public override Sprite CraftIcon => null;
@@ -70,17 +70,22 @@ public class SeaMoth : BaseVehiclePrefab
         }
     };
 
-    public override GameObject BlankVehicleModel => Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab.prefab");
+    public override GameObject gameObject => Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab.prefab");
 
     protected override void PrepareGameObject()
     { 
         base.PrepareGameObject();
 
-        BlankVehicleModel.ApplyAlterraVehicleMaterial();
+        gameObject.ApplyAlterraVehicleMaterial();
 
-         AddComponent(
-             new PhysicsHandler {
-                 HandlerConfig = new PhysicsHandlerConfig(800, 2, 4, 0, 9.81f, -5f, 4, 2, true, false)
-             });
+        AddComponent<PhysicsHandler>()
+            .WithPhysicsConfig(
+                new PhysicsHandlerConfig(800, 2, 4, 0, 9.81f, -5f, 4, 2, true, false
+                ));
+
+        AddComponent<PingHandler>()
+            .WithOrigin(gameObject.transform.Find("PingOrigin"))
+            .WithIcon(Plugin.AssetBundle.LoadAsset<Sprite>("SeamothPingIcon"))
+            .WithName("Seamoth");
     }
 }

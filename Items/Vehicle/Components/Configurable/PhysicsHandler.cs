@@ -1,34 +1,44 @@
 ﻿namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
-public class PhysicsHandler : IHandlerComponent
+public class PhysicsHandler : HandlerComponent
 {
-    public PhysicsHandlerConfig HandlerConfig { get; set; }
+    private Rigidbody _rigidbody;
+    private WorldForces _worldForces;
+    private DealDamageOnImpact _dealDamageOnImpact;
 
-    public GameObject GameObject { get; set; }
-
-    public void Instantiate()
+    public override void Instantiate()
     {
-        var rigidbody = GameObject.AddComponent<Rigidbody>();
-        rigidbody.mass = HandlerConfig.Mass;
-        rigidbody.useGravity = false;
-        rigidbody.drag = HandlerConfig.Drag;
-        rigidbody.angularDrag = HandlerConfig.AngularDrag;
+        _rigidbody = gameObject.AddComponent<Rigidbody>();
+        _worldForces = gameObject.AddComponent<WorldForces>();
+        _dealDamageOnImpact = gameObject.AddComponent<DealDamageOnImpact>();
+        
+        _worldForces.useRigidbody = _rigidbody;
 
-        var worldForces = GameObject.AddComponent<WorldForces>();
-        worldForces.useRigidbody = rigidbody;
-        worldForces.underwaterGravity = HandlerConfig.UnderwaterGravity;
-        worldForces.aboveWaterGravity = HandlerConfig.AboveWaterGravity;
-        worldForces.waterDepth = HandlerConfig.WaterDepth;
-
-        var dealDamageOnImpact = GameObject.AddComponent<DealDamageOnImpact>();
-        dealDamageOnImpact.speedMinimumForSelfDamage = HandlerConfig.SpeedMinimumForSelfDamage;
-        dealDamageOnImpact.speedMinimumForDamage = HandlerConfig.SpeedMinimumForDamage;
-        dealDamageOnImpact.affectsEcosystem = HandlerConfig.AffectsEcosystem;
-        dealDamageOnImpact.allowDamageToPlayer = HandlerConfig.AllowDamageToPlayer;
-
-        var constructionObstacle = GameObject.AddComponent<ConstructionObstacle>();
+        var constructionObstacle = gameObject.AddComponent<ConstructionObstacle>();
         constructionObstacle.reason = "VehicleObstacle";
     }
+    
+    public PhysicsHandler WithPhysicsConfig(PhysicsHandlerConfig config)
+    {
+        _rigidbody.mass = config.Mass;
+        _rigidbody.useGravity = false;
+        _rigidbody.drag = config.Drag;
+        _rigidbody.angularDrag = config.AngularDrag;
+        
+        _worldForces.underwaterGravity = config.UnderwaterGravity;
+        _worldForces.aboveWaterGravity = config.AboveWaterGravity;
+        _worldForces.waterDepth = config.WaterDepth;
+        
+        _dealDamageOnImpact.speedMinimumForSelfDamage = config.SpeedMinimumForSelfDamage;
+        _dealDamageOnImpact.speedMinimumForDamage = config.SpeedMinimumForDamage;
+        _dealDamageOnImpact.affectsEcosystem = config.AffectsEcosystem;
+        _dealDamageOnImpact.allowDamageToPlayer = config.AllowDamageToPlayer;
+        
+        
+        return this;
+    }
+
+    public PhysicsHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
 }
 
 public struct PhysicsHandlerConfig

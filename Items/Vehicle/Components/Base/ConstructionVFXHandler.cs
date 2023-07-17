@@ -3,23 +3,23 @@ using Nautilus.Extensions;
 
 namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Base;
 
-public class ConstructionVFXHandler : IHandlerComponent
+public class ConstructionVFXHandler : HandlerComponent
 {
-    public GameObject GameObject { get; set; }
-
-    public void Instantiate()
+    public ConstructionVFXHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
+    
+    public override void Instantiate()
     {
         var referenceVFX = VehicleHelper.ReferenceVehicle.GetComponent<VFXConstructing>();
 
-        GameObject.AddComponent<VFXConstructing>().CopyComponent(referenceVFX);
+        gameObject.AddComponent<VFXConstructing>().CopyComponent(referenceVFX);
 
-        var buildBots = GameObject.AddComponent<BuildBotBeamPoints>();
-        var beamPointsParent = GameObject.transform.Find("BuildBotBeamPoints");
-        var pathsParent = GameObject.transform.Find("BuildBotPaths");
+        var buildBots = gameObject.AddComponent<BuildBotBeamPoints>();
+        var beamPointsParent = gameObject.transform.Find("BuildBotBeamPoints");
+        var pathsParent = gameObject.transform.Find("BuildBotPaths");
         
         buildBots.beamPoints = Enumerable.Range(0, beamPointsParent.childCount).Select(beamPointsParent.GetChild).ToArray();
         Enumerable.Range(0, pathsParent.childCount)
-            .ForEach(i => CreateBuildBotPath( GameObject, pathsParent.GetChild(i)));
+            .ForEach(i => CreateBuildBotPath( gameObject, pathsParent.GetChild(i)));
     }
     
     private static void CreateBuildBotPath(GameObject prefab, Transform parent)

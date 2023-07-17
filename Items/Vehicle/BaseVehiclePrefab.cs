@@ -6,7 +6,7 @@ namespace VehicleFrameworkNautilus.Items.Vehicle;
 
 public abstract class BaseVehiclePrefab
 {
-    private readonly List<IHandlerComponent> _components = new();
+    private readonly List<HandlerComponent> _components = new();
     
     /// <summary>
     /// Registers the vehicle as a craftable prefab
@@ -21,7 +21,7 @@ public abstract class BaseVehiclePrefab
         
         PrepareGameObject();
         
-        customPrefab.SetGameObject(BlankVehicleModel);
+        customPrefab.SetGameObject(gameObject);
         customPrefab.SetRecipe(Recipe).WithFabricatorType(CraftTree.Type.Constructor).WithStepsToFabricatorTab("Vehicles");
 
         customPrefab.Register();
@@ -40,36 +40,21 @@ public abstract class BaseVehiclePrefab
     /// </summary>
     protected virtual void PrepareGameObject()
     {
-        PrefabUtils.AddBasicComponents(BlankVehicleModel, ClassID, Info.TechType, LargeWorldEntity.CellLevel.Global);
+        PrefabUtils.AddBasicComponents(gameObject, ClassID, Info.TechType, LargeWorldEntity.CellLevel.Global);
         AddComponent<ConstructionVFXHandler>();
     }
 
     /// <summary>
-    ///  Attach an existing instance of a modded handler component to the vehicle
-    /// </summary>
-    /// <param name="component">Instance of the handler component</param>
-    public void AddComponent<T>(T component)
-        where T : IHandlerComponent
-    {
-        component.GameObject = BlankVehicleModel;
-        _components.Add(component);
-        component.Instantiate();
-    }
-    
-    /// <summary>
     /// Instantiate and attach a modded handler component to the vehicle
     /// </summary>
     /// <typeparam name="T">Handler type to be attached</typeparam>
-    public void AddComponent<T>()
-        where T : IHandlerComponent, new()
+    public T AddComponent<T>()
+        where T : HandlerComponent
     {
-        var component = new T
-        {
-            GameObject = BlankVehicleModel
-        };
-        
+        var component = Activator.CreateInstance(typeof(T), this) as T;
         _components.Add(component);
-        component.Instantiate();
+        component?.Instantiate();
+        return component;
     }
 
     /// <summary>
@@ -78,7 +63,7 @@ public abstract class BaseVehiclePrefab
     /// <typeparam name="T">Type of the handler component to be fetched</typeparam>
     /// <returns>The attached handler component of type T (present)</returns>
     public T GetComponent<T>()
-        where T : IHandlerComponent
+        where T : HandlerComponent
     {
         return _components.OfType<T>().ToList().FirstOrDefault();
     }
@@ -94,5 +79,5 @@ public abstract class BaseVehiclePrefab
     public abstract float CraftTime { get; }
     public abstract Sprite CraftIcon { get;  }
     /* Vehicle Data */
-    public abstract GameObject BlankVehicleModel { get; }
+    public abstract GameObject gameObject { get; }
 }
