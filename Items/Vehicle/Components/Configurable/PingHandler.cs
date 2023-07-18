@@ -7,7 +7,7 @@ public class PingHandler : HandlerComponent
     
     public override void Instantiate()
     {
-        _ping = parentVehicle.gameObject.AddComponent<PingInstance>();
+        _ping = parentVehicle.Model.AddComponent<PingInstance>();
     }
 
     public PingHandler WithOrigin(Transform origin)

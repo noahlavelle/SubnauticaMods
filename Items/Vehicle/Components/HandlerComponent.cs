@@ -5,7 +5,7 @@ public abstract class HandlerComponent
     public HandlerComponent(BaseVehiclePrefab parentVehicle)
     {
         this.parentVehicle = parentVehicle;
-        gameObject = parentVehicle.gameObject;
+        gameObject = parentVehicle.Model;
     }
 
     public GameObject gameObject { get; }

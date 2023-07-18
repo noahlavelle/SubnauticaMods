@@ -58,7 +58,7 @@ public class SeaMoth : BaseVehiclePrefab
     public override string ClassID => "seamothmod";
     public override string DisplayName => "Alterra Seamoth";
     public override string Description => "Desc";
-    public override float CraftTime => 20f;
+    public override float CraftTime => 5f;
     public override Sprite CraftIcon => null;
 
     public override RecipeData Recipe => new()
@@ -70,22 +70,70 @@ public class SeaMoth : BaseVehiclePrefab
         }
     };
 
-    public override GameObject gameObject => Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab.prefab");
+    public override GameObject Model => Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab.prefab");
 
-    protected override void PrepareGameObject()
+    protected override void ConfigureVehicle()
     { 
-        base.PrepareGameObject();
+        AddBehaviour<SeaMothBehaviour>();
+        
+        base.ConfigureVehicle();
 
-        gameObject.ApplyAlterraVehicleMaterial();
+        Model.ApplyAlterraVehicleMaterial();
 
-        AddComponent<PhysicsHandler>()
+        PhysicsHandler
             .WithPhysicsConfig(
                 new PhysicsHandlerConfig(800, 2, 4, 0, 9.81f, -5f, 4, 2, true, false
                 ));
 
-        AddComponent<PingHandler>()
-            .WithOrigin(gameObject.transform.Find("PingOrigin"))
+        PingHandler
+            .WithOrigin(Model.transform.Find("PingOrigin"))
             .WithIcon(Plugin.AssetBundle.LoadAsset<Sprite>("SeamothPingIcon"))
             .WithName("Seamoth");
+
+        UpgradeModulesHandler
+            .WithUpgradeConsole(
+                Model.transform.Find("UpgradeConsole"), Model.transform.Find("Model/Vehicle_Anim/UpgradeSlot_Hatch_geo"), Model.transform.Find("UpgradeModulesRoot"))
+            .WithSound(AssetHelper.StorageOpenSound, AssetHelper.StorageCloseSound);
+
+        EnergyHandler
+            .WithBatterySlot(Model.transform.Find("BatterySlot"));
+
+        PositionHandler
+            .WithPositions(
+                Model.transform.Find("Model/Vehicle_Anim/Joints/AttachJoint/CameraPivot"),
+                Model.transform.Find("EndPosition"),
+                Model.transform.Find(
+                    "Model/Vehicle_Anim/Joints/Wheel_Base/Wheel_Segment_1/Wheel_Segment_2/Wheel_Head/LeftIKTarget"),
+                Model.transform.Find(
+                    "Model/Vehicle_Anim/Joints/Wheel_Base/Wheel_Segment_1/Wheel_Segment_2/Wheel_Head/RightIKTarget"),
+                Model.transform.Find(
+                    "AlternateExits")
+            );
+
+        SoundHandler
+            .WithSounds(
+                AssetHelper.SeamothWelcomeSound,
+                AssetHelper.DamageSound,
+                AssetHelper.SplashSound, 
+                AssetHelper.SeamothRevUpSound,
+                AssetHelper.SeamothRevLoopSound,
+                "Seamoth: Welcome aboard, captain"
+            );
+
+        HealthHandler
+            .WithConfig(
+                200, -1, 70, 0.2f, true, true, false
+            );
     }
+}
+
+public class SeaMothBehaviour : BaseVehicleBehaviour
+{
+    protected override string EnterVehicleText => "Enter Seamoth";
+    protected override ControlSheme ControlScheme => ControlSheme.Submersible;
+    protected override float EnergyConsumptionRate => 1f / 15f;
+    protected override float ForwardForce => 12.5f;
+    protected override float BackwardForce => 5.4f;
+    protected override float SidewardForce => 12.52f;
+    protected override float VerticalForce => 11.93f;
 }

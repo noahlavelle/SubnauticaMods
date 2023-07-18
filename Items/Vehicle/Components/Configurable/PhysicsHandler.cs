@@ -13,6 +13,9 @@ public class PhysicsHandler : HandlerComponent
         _dealDamageOnImpact = gameObject.AddComponent<DealDamageOnImpact>();
         
         _worldForces.useRigidbody = _rigidbody;
+        
+        parentVehicle.Behaviour.useRigidbody = _rigidbody;
+        parentVehicle.Behaviour.worldForces = _worldForces;
 
         var constructionObstacle = gameObject.AddComponent<ConstructionObstacle>();
         constructionObstacle.reason = "VehicleObstacle";
@@ -33,8 +36,7 @@ public class PhysicsHandler : HandlerComponent
         _dealDamageOnImpact.speedMinimumForDamage = config.SpeedMinimumForDamage;
         _dealDamageOnImpact.affectsEcosystem = config.AffectsEcosystem;
         _dealDamageOnImpact.allowDamageToPlayer = config.AllowDamageToPlayer;
-        
-        
+
         return this;
     }
 
@@ -54,6 +56,7 @@ public struct PhysicsHandlerConfig
     public readonly float SpeedMinimumForDamage;
     public readonly bool AffectsEcosystem;
     public readonly bool AllowDamageToPlayer;
+    
 
     public PhysicsHandlerConfig(float mass, float drag, float angularDrag, float underwaterGravity, float aboveWaterGravity, float waterDepth, float speedMinimumForSelfDamage, float speedMinimumForDamage, bool affectsEcosystem, bool allowDamageToPlayer)
     {
