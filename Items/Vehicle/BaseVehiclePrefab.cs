@@ -43,6 +43,11 @@ public abstract class BaseVehiclePrefab
     {
         PrefabUtils.AddBasicComponents(Model, ClassID, Info.TechType, LargeWorldEntity.CellLevel.Global);
 
+        foreach (var skyApplier in Model.GetComponentsInChildren<SkyApplier>())
+        {
+            skyApplier.dynamic = true;
+        }
+
         ConstructionVFXHandler = AddComponent<ConstructionVFXHandler>();
         UpgradeModulesHandler = AddComponent<UpgradeModulesHandler>();
         PhysicsHandler = AddComponent<PhysicsHandler>();
@@ -52,6 +57,7 @@ public abstract class BaseVehiclePrefab
         EcoTargetHandler = AddComponent<EcoTargetHandler>();
         SoundHandler = AddComponent<SoundHandler>();
         HealthHandler = AddComponent<HealthHandler>();
+        CrushDepthHandler = AddComponent<CrushDepthHandler>();
     }
 
     /// <summary>
@@ -110,4 +116,5 @@ public abstract class BaseVehiclePrefab
     public EcoTargetHandler EcoTargetHandler { get; private set; }
     public SoundHandler SoundHandler { get; private set; }
     public HealthHandler HealthHandler { get; private set; }
+    public CrushDepthHandler CrushDepthHandler { get; private set; }
 }

@@ -2,31 +2,39 @@
 
 public class PhysicsHandler : HandlerComponent
 {
-    private Rigidbody _rigidbody;
+    public Rigidbody Rigidbody;
+    
     private WorldForces _worldForces;
     private DealDamageOnImpact _dealDamageOnImpact;
 
     public override void Instantiate()
     {
-        _rigidbody = gameObject.AddComponent<Rigidbody>();
+        Rigidbody = gameObject.AddComponent<Rigidbody>();
         _worldForces = gameObject.AddComponent<WorldForces>();
         _dealDamageOnImpact = gameObject.AddComponent<DealDamageOnImpact>();
         
-        _worldForces.useRigidbody = _rigidbody;
+        _worldForces.useRigidbody = Rigidbody;
         
-        parentVehicle.Behaviour.useRigidbody = _rigidbody;
+        parentVehicle.Behaviour.useRigidbody = Rigidbody;
         parentVehicle.Behaviour.worldForces = _worldForces;
 
         var constructionObstacle = gameObject.AddComponent<ConstructionObstacle>();
         constructionObstacle.reason = "VehicleObstacle";
     }
+
+    public PhysicsHandler WithCollision(GameObject collisionParent)
+    {
+        parentVehicle.Behaviour.collisionModel = collisionParent;
+
+        return this;
+    }
     
     public PhysicsHandler WithPhysicsConfig(PhysicsHandlerConfig config)
     {
-        _rigidbody.mass = config.Mass;
-        _rigidbody.useGravity = false;
-        _rigidbody.drag = config.Drag;
-        _rigidbody.angularDrag = config.AngularDrag;
+        Rigidbody.mass = config.Mass;
+        Rigidbody.useGravity = false;
+        Rigidbody.drag = config.Drag;
+        Rigidbody.angularDrag = config.AngularDrag;
         
         _worldForces.underwaterGravity = config.UnderwaterGravity;
         _worldForces.aboveWaterGravity = config.AboveWaterGravity;

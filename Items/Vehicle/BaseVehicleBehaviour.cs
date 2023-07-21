@@ -5,6 +5,9 @@ namespace VehicleFrameworkNautilus.Items.Vehicle;
 public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IHandTarget
 {
     private bool _playerFullyEntered;
+    private static readonly int DockedAnimation = Animator.StringToHash("docked");
+    
+    public EngineRpmSFXManager engineRpmSfxManager;
     public bool PlayerFullyEntered
     {
         get => _playerFullyEntered;
@@ -22,8 +25,6 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         }
     }
 
-    public EngineRpmSFXManager EngineRpmSfxManager;
-    
     public override string[] slotIDs => new []{ "SeamothModule1", "SeamothModule2", "SeamothModule3", "SeamothModule4" };
     public override Vector3[] vehicleDefaultColors => new Vector3[5]
     {
@@ -34,52 +35,21 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         new(0.114f, 0.729f, 0.965f)
     };
 
-    public override void Awake()
-    {
-        LazyInitialize();
-    }
-    
-    private void LazyInitialize()
-    {
-        if (!isInitialized)
-        {
-            isInitialized = true;
-            slotIndexes = new Dictionary<string, int>();
-            int num = 0;
-            string[] array = slotIDs;
-            for (int i = 0; i < array.Length; i++)
-            {
-                _ = array[i];
-                slotIndexes.Add(slotIDs[num], num);
-                num++;
-            }
-            quickSlotTimeUsed = new float[slotIDs.Length];
-            quickSlotCooldown = new float[slotIDs.Length];
-            quickSlotToggled = new bool[slotIDs.Length];
-            quickSlotCharge = new float[slotIDs.Length];
-            modules = new Equipment(base.gameObject, modulesRoot.transform);
-            modules.SetLabel("CyclopsUpgradesStorageLabel");
-            modules.onEquip += OnEquip;
-            modules.onUnequip += OnUnequip;
-            UnlockDefaultModuleSlots();
-            upgradesInput.equipment = modules;
-        }
-    }
-
     public override void Start()
     {
         base.Start();
 
         mainAnimator = transform.GetComponentInChildren<Animator>();
 
-        controlSheme = ControlScheme;
         stabilizeRoll = true;
+        controlSheme = ControlScheme;
         forwardForce = ForwardForce;
         backwardForce = BackwardForce;
         sidewardForce = SidewardForce;
         verticalForce = VerticalForce;
+        handLabel = EnterVehicleText;
     }
-    
+
     public override void Update()
     {
         base.Update();
@@ -88,15 +58,18 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         
         if (GetPilotingMode())
         {
-            var buttonFormat = LanguageCache.GetButtonFormat("PressToExit", GameInput.Button.Exit);
-            HandReticle.main.SetTextRaw(HandReticle.TextType.Use, buttonFormat);
-            HandReticle.main.SetTextRaw(HandReticle.TextType.UseSubscript, string.Empty);
-            
-            var moveVector = AvatarInputHandler.main.IsEnabled() ? GameInput.GetMoveDirection() : Vector3.zero;
-            if (moveVector.magnitude > 0.1f)
-            {
-                ConsumeEngineEnergy(Time.deltaTime * EnergyConsumptionRate * moveVector.magnitude);
-            }
+            ApplyMovement();
+        }
+
+        mainAnimator.SetBool(DockedAnimation, docked);
+    }
+
+    public virtual void ApplyMovement()
+    {
+        var moveVector = AvatarInputHandler.main.IsEnabled() ? GameInput.GetMoveDirection() : Vector3.zero;
+        if (moveVector.magnitude > 0.1f)
+        {
+            ConsumeEngineEnergy(Time.deltaTime * EnergyConsumptionRate * moveVector.magnitude);
         }
     }
     
@@ -105,7 +78,7 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         var vector = AvatarInputHandler.main.IsEnabled() ? GameInput.GetMoveDirection() : Vector3.zero;
         if (CanPilot() && vector.magnitude > 0f && GetPilotingMode())
         {
-            EngineRpmSfxManager.AccelerateInput();
+            engineRpmSfxManager.AccelerateInput();
         }
     }
 
@@ -114,8 +87,7 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         base.OnPilotModeBegin();
         UWE.Utils.EnterPhysicsSyncSection();
         Player.main.EnterInterior(this);
-        Player.main.armsController.SetWorldIKTarget(leftHandPlug, rightHandPlug);
-        UWE.Utils.SetIsKinematicAndUpdateInterpolation(useRigidbody, isKinematic: false);
+        SetPlayerInside(true);
     }
 
     public override void OnPilotModeEnd()
@@ -132,35 +104,11 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         }
     }
 
-    public new void OnHandHover(GUIHand hand)
-    {
-        if (GetPilotingMode()) return;
-        HandReticle.main.SetIcon(HandReticle.IconType.Hand);
-        HandReticle.main.SetText(HandReticle.TextType.Hand, EnterVehicleText, translate: true, GameInput.Button.LeftHand);
-        HandReticle.main.SetText(HandReticle.TextType.HandSubscript, string.Empty, translate: false);
-    }
-    
-    public new void OnHandClick(GUIHand hand)
-    {
-        if (GetPilotingMode()) return;
-        EnterVehicle(hand.player, teleport: true);
-    }
-    
-    
     public override bool CanPilot()
     {
         return !FPSInputModule.current.lockMovement && IsPowered();
     }
 
-    public override void EnterVehicle(Player player, bool teleport, bool playEnterAnimation = true)
-    {
-        base.EnterVehicle(player, teleport, playEnterAnimation);
-        if (!playEnterAnimation)
-        {
-            PlayerFullyEntered = true;
-        }
-    }
-    
     public override void SetPlayerInside(bool inside)
     {
         base.SetPlayerInside(inside);

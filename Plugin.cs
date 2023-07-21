@@ -83,7 +83,8 @@ public class SeaMoth : BaseVehiclePrefab
         PhysicsHandler
             .WithPhysicsConfig(
                 new PhysicsHandlerConfig(800, 2, 4, 0, 9.81f, -5f, 4, 2, true, false
-                ));
+                ))
+            .WithCollision(Model.transform.Find("Collision").gameObject);
 
         PingHandler
             .WithOrigin(Model.transform.Find("PingOrigin"))
@@ -124,6 +125,17 @@ public class SeaMoth : BaseVehiclePrefab
             .WithConfig(
                 200, -1, 70, 0.2f, true, true, false
             );
+
+        CrushDepthHandler
+            .WithConfig(200, 20, 3)
+            .WithSound(Model.transform.Find("crushDamageSound").gameObject, AssetHelper.CrushDamage, AssetHelper.SeamothDepthWarning);
+
+        AddComponent<DockingHandler>()
+            .WithPositions(new Vector3(0, 0, 0))
+            .WithAnimations(Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_dock"),
+                Plugin.AssetBundle.LoadAsset<AnimationClip>("loop_seamoth_docked"),
+                Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_left"),
+                Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_right"));
     }
 }
 

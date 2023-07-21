@@ -25,7 +25,7 @@ public class SoundHandler : HandlerComponent
         _engineRpmSfxManager.engineRpmSFX = _engineLoopingEmitter;
 
         parentVehicle.Behaviour.welcomeNotification = _enterNotification;
-        parentVehicle.Behaviour.EngineRpmSfxManager = _engineRpmSfxManager;
+        parentVehicle.Behaviour.engineRpmSfxManager = _engineRpmSfxManager;
 
     }
 
