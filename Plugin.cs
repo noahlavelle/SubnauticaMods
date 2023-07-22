@@ -42,7 +42,7 @@ public class Plugin : BaseUnityPlugin
     private IEnumerator AwakeAsync()
     {
         Logger = base.Logger;
-        
+
         AssetBundle = AssetBundle.LoadFromFile(Path.Combine(ModFolderPath, "Assets", "seamoth"));
         yield return VehicleHelper.LoadReferenceVehicleAsync();
 
@@ -131,11 +131,12 @@ public class SeaMoth : BaseVehiclePrefab
             .WithSound(Model.transform.Find("crushDamageSound").gameObject, AssetHelper.CrushDamage, AssetHelper.SeamothDepthWarning);
 
         AddComponent<DockingHandler>()
-            .WithPositions(new Vector3(0, 0, 0))
+            .WithPositions(new Vector3(0, 0, 0), DockingHandler.DockingExitSide.Left)
             .WithAnimations(Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_dock"),
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("loop_seamoth_docked"),
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_left"),
-                Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_right"));
+                Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_right"),
+                Plugin.AssetBundle.LoadAsset<AnimationClip>("player_view_moon_seamoth_dock"));
     }
 }
 

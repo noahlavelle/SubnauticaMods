@@ -6,6 +6,16 @@ namespace VehicleFrameworkNautilus.Patches;
 [HarmonyPatch(typeof(VehicleDockingBay))]
 public class MoonpoolPatcher
 {
+    public static Transform DockExitLeft;
+    public static Transform DockExitRight;
+    
+    [HarmonyPostfix, HarmonyPatch(nameof(VehicleDockingBay.Start))]
+    static void StartPostfix(VehicleDockingBay __instance)
+    {
+        DockExitLeft = __instance.exosuitDockPlayerCinematic.endTransform;
+        DockExitRight = __instance.dockPlayerCinematic.endTransform;
+    }
+    
     /**
      * When checking if a vehicle is eligible to dock, the tech type is compared to a SeaTruck and prawn suit
      * This extends this check to include all dockable custom vehicles
@@ -30,48 +40,89 @@ public class MoonpoolPatcher
         if (dockable == null) return;
 
         Plugin.RegisteredVehicles.TryGetValue(GetTechType(dockable.gameObject), out var vehicle);
-        var isOverrideActive = ___animator.runtimeAnimatorController.GetType() == typeof(AnimatorOverrideController);
+        var isVehicleOverrideActive = ___animator.runtimeAnimatorController.GetType() == typeof(AnimatorOverrideController);
+        var isPlayerOverrideActive = Player.main.playerAnimator.runtimeAnimatorController.GetType() == typeof(AnimatorOverrideController);
 
-        if (isOverrideActive)
+        if (vehicle == null)
         {
-            if (vehicle != null) return;
-            Plugin.Logger.LogInfo("Removing animation overrides");
-            ___animator.runtimeAnimatorController =
-                ((AnimatorOverrideController) ___animator.runtimeAnimatorController).runtimeAnimatorController;
-        }
-        else
+            if (isPlayerOverrideActive)
+            {
+                Plugin.Logger.LogInfo("Removing player animation overrides");
+                Player.main.playerAnimator.runtimeAnimatorController =
+                    ((AnimatorOverrideController) Player.main.playerAnimator.runtimeAnimatorController).runtimeAnimatorController;
+            }
+            
+            if (isVehicleOverrideActive)
+            {
+                Plugin.Logger.LogInfo("Removing vehicle animation overrides");
+                ___animator.runtimeAnimatorController =
+                    ((AnimatorOverrideController) ___animator.runtimeAnimatorController).runtimeAnimatorController;
+
+            }
+        } else
         {
-            if (vehicle == null) return;
             var customDockable = vehicle.GetComponent<DockingHandler>();
             
-            var overrideController = new AnimatorOverrideController
+            if (!isVehicleOverrideActive)
             {
-                runtimeAnimatorController = ___animator.runtimeAnimatorController
-            };
+                Plugin.Logger.LogInfo("Overriding vehicle docking animation");
+                var overrideController = new AnimatorOverrideController
+                {
+                    runtimeAnimatorController = ___animator.runtimeAnimatorController
+                };
             
-            ___animator.runtimeAnimatorController = overrideController;
+                ___animator.runtimeAnimatorController = overrideController;
             
-            var dockingAnimation = overrideController.animationClips.First(a => a.name == "seatruck_dock");
-            var dockingLoopAnimation = overrideController.animationClips.First(a => a.name == "seatruck_docked");
-            var launchLeftAnimation = overrideController.animationClips.First(a => a.name == "enter_left");
-            var launchRightAnimation = overrideController.animationClips.First(a => a.name == "enter_right");
+                var dockingAnimation = overrideController.animationClips.First(a => a.name == "seatruck_dock");
+                var dockingLoopAnimation = overrideController.animationClips.First(a => a.name == "seatruck_docked");
+                var launchLeftAnimation = overrideController.animationClips.First(a => a.name == "enter_left");
+                var launchRightAnimation = overrideController.animationClips.First(a => a.name == "enter_right");
 
-            var clipOverrides = new List<KeyValuePair<AnimationClip, AnimationClip>>
-            {
-                new(dockingAnimation, customDockable.DockingAnimation),
-                new(dockingLoopAnimation, customDockable.DockingLoopAnimation),
-                new(launchLeftAnimation, customDockable.LaunchLeftAnimation),
-                new(launchRightAnimation, customDockable.LaunchRightAnimation),
-            };
+                var clipOverrides = new List<KeyValuePair<AnimationClip, AnimationClip>>
+                {
+                    new(dockingAnimation, customDockable.DockingAnimation),
+                    new(dockingLoopAnimation, customDockable.DockingLoopAnimation),
+                    new(launchLeftAnimation, customDockable.LaunchLeftAnimation),
+                    new(launchRightAnimation, customDockable.LaunchRightAnimation),
+                };
         
-            overrideController.ApplyOverrides(clipOverrides);
+                overrideController.ApplyOverrides(clipOverrides);
+            }
+
+            if (!isPlayerOverrideActive)
+            {
+                Plugin.Logger.LogInfo("Overriding player docking animation");
+                var overrideController = new AnimatorOverrideController
+                {
+                    runtimeAnimatorController = Player.main.playerAnimator.runtimeAnimatorController
+                };
+                
+                Player.main.playerAnimator.runtimeAnimatorController = overrideController;
+
+                overrideController["player_seatruck_moonpool_dock"] = customDockable.PlayerDockingAnimation;
+            }
         }
     }
     
     [HarmonyPostfix, HarmonyPatch("UpdateDocking")]
-    static void TriggerDockingAnimationPostfix(Dockable ____dockedObject, Animator ___animator, bool ___docked_param)
+    static void TriggerDockingAnimationPostfix(Dockable ____dockedObject, Animator ___animator, bool ___docked_param, VehicleDockingBay __instance)
     {
-        SafeAnimator.SetBool(___animator, "seamoth_docked", ___docked_param);
+        if (____dockedObject && Plugin.RegisteredVehicles.TryGetValue(GetTechType(____dockedObject.gameObject), out var vehicle))
+        {
+            var dockingHandler = vehicle.GetComponent<DockingHandler>();
+            if (dockingHandler == null) return;
+            
+            SafeAnimator.SetBool(___animator, "seamoth_docked", ___docked_param);
+            if (__instance.dockPlayerCinematic.cinematicModeActive)
+            {
+                __instance.dockPlayerCinematic.endTransform = dockingHandler.DockingCinematicExitSide == DockingHandler.DockingExitSide.Left ? DockExitLeft : DockExitRight;
+            }
+        }
+        else
+        {
+            __instance.exosuitDockPlayerCinematic.endTransform = DockExitLeft;
+            __instance.dockPlayerCinematic.endTransform = DockExitRight;
+        }
     }
 
     /**

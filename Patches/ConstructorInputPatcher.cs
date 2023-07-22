@@ -34,3 +34,8 @@ public class ConstructorInputPatcher
         return false;
     }
 }
+
+[HarmonyPatch(typeof(PlayerCinematicController), nameof(PlayerCinematicController.OnPlayerCinematicModeEnd))]
+public class TestPatcher
+{
+}

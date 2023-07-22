@@ -4,6 +4,14 @@ namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 public class DockingHandler : HandlerComponent
 {
+    public enum DockingExitSide
+    {
+        Left,
+        Right,
+    }
+
+    public DockingExitSide DockingCinematicExitSide;
+    
     public Vector3 DockingEndPoint;
     public AnimatorOverrideController OverrideController;
 
@@ -11,6 +19,7 @@ public class DockingHandler : HandlerComponent
     public AnimationClip DockingLoopAnimation;
     public AnimationClip LaunchLeftAnimation;
     public AnimationClip LaunchRightAnimation;
+    public AnimationClip PlayerDockingAnimation;
 
     private ColorCustomizer _colorCustomizer;
     private RedockLock _redockLock;
@@ -28,22 +37,24 @@ public class DockingHandler : HandlerComponent
         _redockLock = parentVehicle.Model.AddComponent<RedockLock>();
     }
 
-    public DockingHandler WithPositions(Vector3 dockingEndPoint, float dockingUnlockDistance = 5)
+    public DockingHandler WithPositions(Vector3 dockingEndPoint, DockingExitSide dockingCinematicExitSide, float dockingUnlockDistance = 5)
     {
         DockingEndPoint = dockingEndPoint;
+        DockingCinematicExitSide = dockingCinematicExitSide;
         _redockLock.unlockDistance = dockingUnlockDistance;
-        
+
         return this;
     }
 
     public DockingHandler WithAnimations(
-        AnimationClip dockingAnimation, AnimationClip dockingLoopAnimation, AnimationClip launchLeftAnimation, AnimationClip launchRightAnimation
+        AnimationClip dockingAnimation, AnimationClip dockingLoopAnimation, AnimationClip launchLeftAnimation, AnimationClip launchRightAnimation, AnimationClip playerDockingAnimation
         )
     {
         DockingAnimation = dockingAnimation;
         DockingLoopAnimation = dockingLoopAnimation;
         LaunchLeftAnimation = launchLeftAnimation;
         LaunchRightAnimation = launchRightAnimation;
+        PlayerDockingAnimation = playerDockingAnimation;
 
         OverrideController = new AnimatorOverrideController();
         return this;
