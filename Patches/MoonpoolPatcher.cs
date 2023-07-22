@@ -134,6 +134,7 @@ public class MoonpoolPatcher
         Quaternion ___startRotation, Transform ___dockingEndPos)
     {
         if (!Plugin.RegisteredVehicles.TryGetValue(GetTechType(dockable.gameObject), out var vehicle)) return true;
+        
         var customDockable = vehicle.GetComponent<DockingHandler>();
         var originalPosition = ___dockingEndPos.localPosition;
         ___dockingEndPos.localPosition = customDockable.DockingEndPoint;
@@ -166,5 +167,4 @@ public class MoonpoolPatcher
         var redockLock = ____dockedObject.gameObject.GetComponent<DockingHandler.RedockLock>();
         redockLock.Lock(__instance);
     }
-
 }

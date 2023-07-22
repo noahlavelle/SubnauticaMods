@@ -6,7 +6,7 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
 {
     private bool _playerFullyEntered;
     private static readonly int DockedAnimation = Animator.StringToHash("docked");
-    
+
     public EngineRpmSFXManager engineRpmSfxManager;
     public bool PlayerFullyEntered
     {
@@ -58,13 +58,15 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         
         if (GetPilotingMode())
         {
-            ApplyMovement();
+            ConsumeEnergy();
         }
+
+        useRigidbody.isKinematic = dockable.isInTransition;
 
         mainAnimator.SetBool(DockedAnimation, docked);
     }
 
-    public virtual void ApplyMovement()
+    public virtual void ConsumeEnergy()
     {
         var moveVector = AvatarInputHandler.main.IsEnabled() ? GameInput.GetMoveDirection() : Vector3.zero;
         if (moveVector.magnitude > 0.1f)
