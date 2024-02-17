@@ -99,7 +99,14 @@ public class MoonpoolPatcher
                 
                 Player.main.playerAnimator.runtimeAnimatorController = overrideController;
 
-                overrideController["player_seatruck_moonpool_dock"] = customDockable.PlayerDockingAnimation;
+                var playerSeatruckMoonpoolDockAnimation = overrideController.animationClips.First(a => a.name == "player_seatruck_moonpool_dock");
+
+                var clipOverrides = new List<KeyValuePair<AnimationClip, AnimationClip>>
+                {
+                    new(playerSeatruckMoonpoolDockAnimation, customDockable.PlayerDockingAnimation),
+                };
+                
+                overrideController.ApplyOverrides(clipOverrides);
             }
         }
     }

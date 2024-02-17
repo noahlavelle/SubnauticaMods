@@ -8,7 +8,7 @@
     <LangVersion>11</LangVersion>
 	<RootNamespace>VehicleFrameworkNautilus</RootNamespace>
 
-    <_OutputCopyLocation>D:\SteamLibrary\steamapps\common\SubnauticaZero\BepInEx\plugins\</_OutputCopyLocation>
+    <_OutputCopyLocation>C:\Program Files (x86)\Steam\steamapps\common\SubnauticaZero\BepInEx\plugins\</_OutputCopyLocation>
 
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;

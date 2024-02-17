@@ -1,30 +1,13 @@
 ﻿using mset;
+using VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 namespace VehicleFrameworkNautilus.Items.Vehicle;
 
 public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IHandTarget
 {
-    private bool _playerFullyEntered;
     private static readonly int DockedAnimation = Animator.StringToHash("docked");
 
     public EngineRpmSFXManager engineRpmSfxManager;
-    public bool PlayerFullyEntered
-    {
-        get => _playerFullyEntered;
-        set
-        {
-            _playerFullyEntered = value;
-            if (_playerFullyEntered)
-            {
-                Player.main.armsController.SetWorldIKTarget(leftHandPlug, rightHandPlug);
-            }
-            else
-            {
-                Player.main.armsController.SetWorldIKTarget(null, null);
-            }
-        }
-    }
-
     public override string[] slotIDs => new []{ "SeamothModule1", "SeamothModule2", "SeamothModule3", "SeamothModule4" };
     public override Vector3[] vehicleDefaultColors => new Vector3[5]
     {
@@ -53,7 +36,7 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
     public override void Update()
     {
         base.Update();
-        
+
         UpdateSounds();
         
         if (GetPilotingMode())
@@ -87,17 +70,21 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
     public override void OnPilotModeBegin()
     {
         base.OnPilotModeBegin();
+
+        Player.main.inSeatruckPilotingChair = true;
         UWE.Utils.EnterPhysicsSyncSection();
         Player.main.EnterInterior(this);
-        SetPlayerInside(true);
+        
+        Player.main.armsController.SetWorldIKTarget(leftHandPlug, rightHandPlug);
     }
 
     public override void OnPilotModeEnd()
     {
         base.OnPilotModeEnd();
+
+        Player.main.inSeatruckPilotingChair = false;
         UWE.Utils.ExitPhysicsSyncSection();
         Player.main.armsController.SetWorldIKTarget(null, null);
-        mainAnimator.SetBool("player_in", false);
         Player.main.ExitCurrentInterior();
         PlatformUtils.ResetLightBarColor();
         if (movePlayerComp != null)
@@ -111,18 +98,12 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         return !FPSInputModule.current.lockMovement && IsPowered();
     }
 
-    public override void SetPlayerInside(bool inside)
-    {
-        base.SetPlayerInside(inside);
-        PlayerFullyEntered = inside;
-    }
-    
     public void SetPlayerInsideState(bool state) { }
     public void OnPlayerKill(){ }
 
     public bool IsPlayerInside()
     {
-        return PlayerFullyEntered;
+        return Player.main.currentMountedVehicle == this;
     }
 
     public float GetInsideTemperature()

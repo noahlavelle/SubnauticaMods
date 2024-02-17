@@ -1,18 +1,19 @@
 ﻿using System.Runtime.CompilerServices;
-using VehicleFrameworkNautilus.Items.Vehicle;
+using UnityEngine.EventSystems;
 
 namespace VehicleFrameworkNautilus.Patches;
 
 
-[HarmonyPatch(typeof(Crafter), nameof(Crafter.Craft))]
+[HarmonyPatch]
 public class ConstructorInputPatcher
 {
     [HarmonyReversePatch]
+    [HarmonyPatch(typeof(Crafter), nameof(Crafter.Craft))]
     [MethodImpl(MethodImplOptions.NoInlining)]
-    static void BaseCraftDummy(Crafter instance, TechType techType, float duration) { }
-
-    [HarmonyPatch(typeof(ConstructorInput), nameof(ConstructorInput.Craft))]
+    static void BaseCraft(Crafter instance, TechType techType, float duration) { }
+    
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(ConstructorInput), nameof(ConstructorInput.Craft))]
     static bool CraftPostfix(ConstructorInput __instance, TechType techType)
     {
         if (!Plugin.RegisteredVehicles.TryGetValue(techType, out var vehicle)) return true;
@@ -28,14 +29,9 @@ public class ConstructorInputPatcher
         }
         else if (CrafterLogic.ConsumeResources(techType))
         {
-            BaseCraftDummy(__instance, techType, vehicle.CraftTime);
+            BaseCraft(__instance, techType, vehicle.CraftTime);
         }
 
         return false;
     }
-}
-
-[HarmonyPatch(typeof(PlayerCinematicController), nameof(PlayerCinematicController.OnPlayerCinematicModeEnd))]
-public class TestPatcher
-{
 }

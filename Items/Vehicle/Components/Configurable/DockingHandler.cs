@@ -21,6 +21,8 @@ public class DockingHandler : HandlerComponent
     public AnimationClip LaunchRightAnimation;
     public AnimationClip PlayerDockingAnimation;
 
+    public float DockingExitAnimationDelay;
+
     private ColorCustomizer _colorCustomizer;
     private RedockLock _redockLock;
 
@@ -30,7 +32,7 @@ public class DockingHandler : HandlerComponent
         dockable.rb = parentVehicle.PhysicsHandler.Rigidbody;
         dockable.vehicle = parentVehicle.Behaviour;
         parentVehicle.Behaviour.dockable = dockable;
-        
+
         _colorCustomizer = parentVehicle.Model.AddComponent<ColorCustomizer>();
         _colorCustomizer.isBase = false;
         
@@ -47,14 +49,14 @@ public class DockingHandler : HandlerComponent
     }
 
     public DockingHandler WithAnimations(
-        AnimationClip dockingAnimation, AnimationClip dockingLoopAnimation, AnimationClip launchLeftAnimation, AnimationClip launchRightAnimation, AnimationClip playerDockingAnimation
-        )
+        AnimationClip dockingAnimation, AnimationClip dockingLoopAnimation, AnimationClip launchLeftAnimation, AnimationClip launchRightAnimation, AnimationClip playerDockingAnimation, float dockingExitAnimationDelay)
     {
         DockingAnimation = dockingAnimation;
         DockingLoopAnimation = dockingLoopAnimation;
         LaunchLeftAnimation = launchLeftAnimation;
         LaunchRightAnimation = launchRightAnimation;
         PlayerDockingAnimation = playerDockingAnimation;
+        DockingExitAnimationDelay = dockingExitAnimationDelay;
 
         OverrideController = new AnimatorOverrideController();
         return this;

@@ -136,7 +136,8 @@ public class SeaMoth : BaseVehiclePrefab
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("loop_seamoth_docked"),
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_left"),
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_right"),
-                Plugin.AssetBundle.LoadAsset<AnimationClip>("player_view_moon_seamoth_dock"));
+                Plugin.AssetBundle.LoadAsset<AnimationClip>("player_view_moon_seamoth_dock"),
+                3f);
     }
 }
 
