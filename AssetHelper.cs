@@ -52,8 +52,18 @@ public static class AssetHelper
         "{eefd976d-e272-4ad7-9a60-3e0d22066b66}",
         "splash_in_and_out");
 
-    public static FMODAsset CrushDamage = LoadFmodAsset(
+    public static readonly FMODAsset CrushDamageSound = LoadFmodAsset(
         "event:/sub/seamoth/crush_damage",
         "{905b4b2c-e1cc-4420-8040-bf45df04ce08}",
         "crush_damage");
+
+    public static readonly FMODAsset LightOnSound = LoadFmodAsset(
+        "event:/sub/seamoth/seamoth_light_on",
+        "{ff87fd3b-ef80-40be-8eed-cf3b1da407c5}",
+        "seamoth_light_on");
+    
+    public static readonly FMODAsset LightOffSound = LoadFmodAsset(
+        "event:/sub/seamoth/seamoth_light_off",
+        "{b98a6113-583d-437d-bece-ea8e245cbe55}",
+        "seamoth_light_off");
 }

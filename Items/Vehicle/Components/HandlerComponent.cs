@@ -1,15 +1,19 @@
 ﻿namespace VehicleFrameworkNautilus.Items.Vehicle.Components;
 
-public abstract class HandlerComponent
+public abstract class HandlerComponent : MonoBehaviour
 {
-    public HandlerComponent(BaseVehiclePrefab parentVehicle)
+    private BaseVehicleBehaviour _vehicleBehaviour;
+
+    protected BaseVehicleBehaviour VehicleBehaviour
     {
-        this.parentVehicle = parentVehicle;
-        gameObject = parentVehicle.Model;
+        get
+        {
+            if (_vehicleBehaviour == null)
+            {
+                _vehicleBehaviour = gameObject.GetComponent<BaseVehicleBehaviour>();
+            }
+
+            return _vehicleBehaviour;
+        }
     }
-
-    public GameObject gameObject { get; }
-    public BaseVehiclePrefab parentVehicle { get; }
-
-    public abstract void Instantiate();
 }

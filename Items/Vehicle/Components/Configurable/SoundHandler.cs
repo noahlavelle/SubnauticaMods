@@ -2,46 +2,61 @@
 
 public class SoundHandler : HandlerComponent
 {
-    private VoiceNotification _enterNotification;
-    private SoundOnDamage _soundOnDamage;
-
-    private FMOD_CustomEmitter _engineRevUpEmitter;
-    private FMOD_CustomLoopingEmitter _engineLoopingEmitter;
-    private EngineRpmSFXManager _engineRpmSfxManager;
+    [SerializeField] private EngineRpmSFXManager _engineRpmSfxManager;
     
-    public override void Instantiate()
+    [SerializeField] private FMODAsset _welcomeSound;
+    [SerializeField] private string _welcomeText;
+    [SerializeField] private FMODAsset _revUpSound;
+    [SerializeField] private FMODAsset _revLoopSound;
+    [SerializeField] private FMODAsset _damageSound;
+    [SerializeField] private FMODAsset _splashSound;
+    
+    public void Awake()
     {
-        _enterNotification = parentVehicle.Model.AddComponent<VoiceNotification>();
-        _soundOnDamage = parentVehicle.Model.AddComponent<SoundOnDamage>();
-        _engineRevUpEmitter = parentVehicle.Model.AddComponent<FMOD_CustomEmitter>();
-        _engineLoopingEmitter = parentVehicle.Model.AddComponent<FMOD_CustomLoopingEmitter>();
-        _engineRpmSfxManager = parentVehicle.Model.AddComponent<EngineRpmSFXManager>();
+        var enterNotification = gameObject.AddComponent<VoiceNotification>();
+        enterNotification.sound = _welcomeSound;
+        enterNotification.text = _welcomeText;
         
-        _soundOnDamage.damageType = DamageType.Collide;
-
-        _engineRevUpEmitter.restartOnPlay = true;
-        _engineRpmSfxManager.rampDownSpeed = 0.5f;
-        _engineRpmSfxManager.engineRevUp = _engineRevUpEmitter;
-        _engineRpmSfxManager.engineRpmSFX = _engineLoopingEmitter;
-
-        parentVehicle.Behaviour.welcomeNotification = _enterNotification;
-        parentVehicle.Behaviour.engineRpmSfxManager = _engineRpmSfxManager;
-
+        var soundOnDamage = gameObject.AddComponent<SoundOnDamage>();
+        soundOnDamage.sound = _damageSound;
+        soundOnDamage.damageType = DamageType.Collide;
+        
+        VehicleBehaviour.welcomeNotification = enterNotification;
+        VehicleBehaviour.splashSound = _splashSound;
     }
 
     public SoundHandler WithSounds(FMODAsset welcomeSound, FMODAsset damageSound, FMODAsset splashSound, FMODAsset revUpSound, FMODAsset revLoopSound, string welcomeText)
     {
-        _enterNotification.sound = welcomeSound;
-        _enterNotification.text = welcomeText;
+        _welcomeSound = welcomeSound;
+        _welcomeText = welcomeText;
+        _damageSound = damageSound;
+        _revUpSound = revUpSound;
+        _revLoopSound = revLoopSound;
+        _splashSound = splashSound;
         
-        _engineRevUpEmitter.asset = revUpSound;
-        _engineLoopingEmitter.asset = revLoopSound;
+        var engineRevUpEmitter = gameObject.AddComponent<FMOD_CustomEmitter>();
+        engineRevUpEmitter.asset = _revUpSound;
+        engineRevUpEmitter.restartOnPlay = true;
+        
+        var engineLoopingEmitter = gameObject.AddComponent<FMOD_CustomLoopingEmitter>();
+        engineLoopingEmitter.asset = _revLoopSound;
+        Plugin.Logger.LogInfo(_revLoopSound);
+        
+        _engineRpmSfxManager = gameObject.AddComponent<EngineRpmSFXManager>();
+        _engineRpmSfxManager.rampDownSpeed = 0.5f;
+        _engineRpmSfxManager.engineRevUp = engineRevUpEmitter;
+        _engineRpmSfxManager.engineRpmSFX = engineLoopingEmitter;
 
-        _soundOnDamage.sound = damageSound;
-        parentVehicle.Behaviour.splashSound = splashSound;
 
         return this;
     }
     
-    public SoundHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
+    public void Update()
+    {
+        var vector = AvatarInputHandler.main.IsEnabled() ? GameInput.GetMoveDirection() : Vector3.zero;
+        if (VehicleBehaviour.CanPilot() && vector.magnitude > 0f && VehicleBehaviour.GetPilotingMode())
+        {
+            _engineRpmSfxManager.AccelerateInput();
+        }
+    }
 }

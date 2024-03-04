@@ -4,37 +4,48 @@ namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 public class PositionHandler : HandlerComponent
 {
-    private MovePlayer _movePlayer;
-
-    public override void Instantiate()
+    [SerializeField] private Transform _sitPosition;
+    [SerializeField] private Transform _exitPosition;
+    [SerializeField] private Transform _leftHandTarget;
+    [SerializeField] private Transform _rightHandTarget;
+    [SerializeField] private Transform _altPositionsParent;
+    
+    public void Awake()
     {
-        _movePlayer = parentVehicle.Model.AddComponent<MovePlayer>();
+        var movePlayer = gameObject.AddComponent<MovePlayer>();
+        VehicleBehaviour.movePlayerComp = movePlayer;
+        movePlayer.from = _sitPosition;
+        movePlayer.to = _exitPosition;
+        movePlayer.followTransformMovement = false;
+        
+        VehicleBehaviour.playerPosition = _sitPosition.gameObject;
+        VehicleBehaviour.playerSits = true;
+        VehicleBehaviour.leftHandPlug = _leftHandTarget;
+        VehicleBehaviour.rightHandPlug = _rightHandTarget;
+
+        VehicleBehaviour.altExitPositions = new Transform[_altPositionsParent.childCount];
+        foreach (Transform child in _altPositionsParent)
+        {
+            VehicleBehaviour.altExitPositions.Add(child);
+        }
+        
+        VehicleBehaviour.exitPosLand = _exitPosition;
+        VehicleBehaviour.exitPosWater = _exitPosition;
+        VehicleBehaviour.movePlayerComp = movePlayer;
     }
 
     public PositionHandler WithPositions(Transform sitPosition, Transform exitPosition, Transform leftHandTarget, Transform rightHandTarget, Transform altPositionsParent)
     {
-        _movePlayer.from = sitPosition;
-        _movePlayer.to = exitPosition;
-        _movePlayer.followTransformMovement = false;
+        _sitPosition = sitPosition;
+        _exitPosition = exitPosition;
 
-        parentVehicle.Behaviour.movePlayerComp = _movePlayer;
-        parentVehicle.Behaviour.playerPosition = sitPosition.gameObject;
-        parentVehicle.Behaviour.playerSits = true;
-        parentVehicle.Behaviour.leftHandPlug = leftHandTarget;
-        parentVehicle.Behaviour.rightHandPlug = rightHandTarget;
+        _leftHandTarget = leftHandTarget;
+        _rightHandTarget = rightHandTarget;
+
+        _altPositionsParent = altPositionsParent;
         
-        parentVehicle.Behaviour.altExitPositions = new Transform[altPositionsParent.childCount];
-        foreach (Transform child in altPositionsParent)
-        {
-            parentVehicle.Behaviour.altExitPositions.Add(child);
-        }
-        
-        parentVehicle.Behaviour.exitPosLand = exitPosition;
-        parentVehicle.Behaviour.exitPosWater = exitPosition;
-        parentVehicle.Behaviour.movePlayerComp = _movePlayer;
+
         
         return this;
     }
-    
-    public PositionHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
 }

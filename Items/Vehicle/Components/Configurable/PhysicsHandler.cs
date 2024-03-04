@@ -1,54 +1,58 @@
-﻿namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
+﻿using UnityEngine.Serialization;
+
+namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 public class PhysicsHandler : HandlerComponent
 {
-    public Rigidbody Rigidbody;
+    public Rigidbody rigidbody;
+    public WorldForces worldForces;
     
-    private WorldForces _worldForces;
-    private DealDamageOnImpact _dealDamageOnImpact;
+    [SerializeField] private PhysicsHandlerConfig _config;
+    [SerializeField] private GameObject collisionParent;
 
-    public override void Instantiate()
+    public void Awake()
     {
-        Rigidbody = gameObject.AddComponent<Rigidbody>();
-        _worldForces = gameObject.AddComponent<WorldForces>();
-        _dealDamageOnImpact = gameObject.AddComponent<DealDamageOnImpact>();
+        var dealDamageOnImpact = gameObject.AddComponent<DealDamageOnImpact>();
+        dealDamageOnImpact.speedMinimumForSelfDamage = _config.SpeedMinimumForSelfDamage;
+        dealDamageOnImpact.speedMinimumForDamage = _config.SpeedMinimumForDamage;
+        dealDamageOnImpact.affectsEcosystem = _config.AffectsEcosystem;
+        dealDamageOnImpact.allowDamageToPlayer = _config.AllowDamageToPlayer;
         
-        _worldForces.useRigidbody = Rigidbody;
-        
-        parentVehicle.Behaviour.useRigidbody = Rigidbody;
-        parentVehicle.Behaviour.worldForces = _worldForces;
-
         var constructionObstacle = gameObject.AddComponent<ConstructionObstacle>();
         constructionObstacle.reason = "VehicleObstacle";
+        
+        VehicleBehaviour.collisionModel = collisionParent;
     }
 
     public PhysicsHandler WithCollision(GameObject collisionParent)
     {
-        parentVehicle.Behaviour.collisionModel = collisionParent;
+        this.collisionParent = collisionParent;
 
         return this;
     }
     
     public PhysicsHandler WithPhysicsConfig(PhysicsHandlerConfig config)
     {
-        Rigidbody.mass = config.Mass;
-        Rigidbody.useGravity = false;
-        Rigidbody.drag = config.Drag;
-        Rigidbody.angularDrag = config.AngularDrag;
-        
-        _worldForces.underwaterGravity = config.UnderwaterGravity;
-        _worldForces.aboveWaterGravity = config.AboveWaterGravity;
-        _worldForces.waterDepth = config.WaterDepth;
-        
-        _dealDamageOnImpact.speedMinimumForSelfDamage = config.SpeedMinimumForSelfDamage;
-        _dealDamageOnImpact.speedMinimumForDamage = config.SpeedMinimumForDamage;
-        _dealDamageOnImpact.affectsEcosystem = config.AffectsEcosystem;
-        _dealDamageOnImpact.allowDamageToPlayer = config.AllowDamageToPlayer;
+        _config = config;
 
+        rigidbody = gameObject.AddComponent<Rigidbody>();
+        worldForces = gameObject.AddComponent<WorldForces>();
+        
+        rigidbody.mass = _config.Mass;
+        rigidbody.useGravity = false;
+        rigidbody.drag = _config.Drag;
+        rigidbody.angularDrag = _config.AngularDrag;
+        
+        worldForces.underwaterGravity = _config.UnderwaterGravity;
+        worldForces.aboveWaterGravity = _config.AboveWaterGravity;
+        worldForces.waterDepth = _config.WaterDepth;
+        worldForces.useRigidbody = rigidbody;
+        
+        VehicleBehaviour.useRigidbody = rigidbody;
+        VehicleBehaviour.worldForces = worldForces;
+        
         return this;
     }
-
-    public PhysicsHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
 }
 
 public struct PhysicsHandlerConfig

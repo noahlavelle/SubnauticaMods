@@ -1,13 +1,13 @@
 ﻿using mset;
-using VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
+using UnityEngine.Events;
+using VehicleFrameworkNautilus.Items.Vehicle.Components;
 
 namespace VehicleFrameworkNautilus.Items.Vehicle;
 
 public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IHandTarget
 {
     private static readonly int DockedAnimation = Animator.StringToHash("docked");
-
-    public EngineRpmSFXManager engineRpmSfxManager;
+    
     public override string[] slotIDs => new []{ "SeamothModule1", "SeamothModule2", "SeamothModule3", "SeamothModule4" };
     public override Vector3[] vehicleDefaultColors => new Vector3[5]
     {
@@ -21,7 +21,7 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
     public override void Start()
     {
         base.Start();
-
+        
         mainAnimator = transform.GetComponentInChildren<Animator>();
 
         stabilizeRoll = true;
@@ -32,20 +32,16 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         verticalForce = VerticalForce;
         handLabel = EnterVehicleText;
     }
-
+    
     public override void Update()
     {
         base.Update();
-
-        UpdateSounds();
         
         if (GetPilotingMode())
         {
             ConsumeEnergy();
         }
-
-        useRigidbody.isKinematic = dockable.isInTransition;
-
+        
         mainAnimator.SetBool(DockedAnimation, docked);
     }
 
@@ -55,15 +51,6 @@ public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IH
         if (moveVector.magnitude > 0.1f)
         {
             ConsumeEngineEnergy(Time.deltaTime * EnergyConsumptionRate * moveVector.magnitude);
-        }
-    }
-    
-    private void UpdateSounds()
-    {
-        var vector = AvatarInputHandler.main.IsEnabled() ? GameInput.GetMoveDirection() : Vector3.zero;
-        if (CanPilot() && vector.magnitude > 0f && GetPilotingMode())
-        {
-            engineRpmSfxManager.AccelerateInput();
         }
     }
 

@@ -1,7 +1,9 @@
 ﻿using System.Linq;
+using UnityEngine.Serialization;
 
 namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
+[RequireComponent(typeof(PhysicsHandler))]
 public class DockingHandler : HandlerComponent
 {
     public enum DockingExitSide
@@ -10,40 +12,42 @@ public class DockingHandler : HandlerComponent
         Right,
     }
 
-    public DockingExitSide DockingCinematicExitSide;
+    public DockingExitSide dockingCinematicExitSide;
     
-    public Vector3 DockingEndPoint;
-    public AnimatorOverrideController OverrideController;
+    public Vector3 dockingEndPoint;
+    public AnimatorOverrideController overrideController;
 
-    public AnimationClip DockingAnimation;
-    public AnimationClip DockingLoopAnimation;
-    public AnimationClip LaunchLeftAnimation;
-    public AnimationClip LaunchRightAnimation;
-    public AnimationClip PlayerDockingAnimation;
+    public AnimationClip dockingAnimation;
+    public AnimationClip dockingLoopAnimation;
+    public AnimationClip launchLeftAnimation;
+    public AnimationClip launchRightAnimation;
+    public AnimationClip playerDockingAnimation;
 
-    public float DockingExitAnimationDelay;
+    public float dockingExitAnimationDelay;
 
-    private ColorCustomizer _colorCustomizer;
-    private RedockLock _redockLock;
+    [SerializeField] private ColorCustomizer _colorCustomizer;
+    [SerializeField] private RedockLock _redockLock;
+    [SerializeField] private float _unlockDistance;
 
-    public override void Instantiate()
+    public void Awake()
     {
-        var dockable = parentVehicle.Model.AddComponent<Dockable>();
-        dockable.rb = parentVehicle.PhysicsHandler.Rigidbody;
-        dockable.vehicle = parentVehicle.Behaviour;
-        parentVehicle.Behaviour.dockable = dockable;
+        var dockable = gameObject.AddComponent<Dockable>();
+        dockable.rb = gameObject.GetComponent<PhysicsHandler>().rigidbody;
+        dockable.vehicle = VehicleBehaviour;
+        VehicleBehaviour.dockable = dockable;
 
-        _colorCustomizer = parentVehicle.Model.AddComponent<ColorCustomizer>();
+        _colorCustomizer = gameObject.AddComponent<ColorCustomizer>();
         _colorCustomizer.isBase = false;
         
-        _redockLock = parentVehicle.Model.AddComponent<RedockLock>();
+        _redockLock = gameObject.AddComponent<RedockLock>();
+        _redockLock.unlockDistance = _unlockDistance;
     }
 
     public DockingHandler WithPositions(Vector3 dockingEndPoint, DockingExitSide dockingCinematicExitSide, float dockingUnlockDistance = 5)
     {
-        DockingEndPoint = dockingEndPoint;
-        DockingCinematicExitSide = dockingCinematicExitSide;
-        _redockLock.unlockDistance = dockingUnlockDistance;
+        this.dockingEndPoint = dockingEndPoint;
+        this.dockingCinematicExitSide = dockingCinematicExitSide;
+        _unlockDistance = dockingUnlockDistance;
 
         return this;
     }
@@ -51,14 +55,14 @@ public class DockingHandler : HandlerComponent
     public DockingHandler WithAnimations(
         AnimationClip dockingAnimation, AnimationClip dockingLoopAnimation, AnimationClip launchLeftAnimation, AnimationClip launchRightAnimation, AnimationClip playerDockingAnimation, float dockingExitAnimationDelay)
     {
-        DockingAnimation = dockingAnimation;
-        DockingLoopAnimation = dockingLoopAnimation;
-        LaunchLeftAnimation = launchLeftAnimation;
-        LaunchRightAnimation = launchRightAnimation;
-        PlayerDockingAnimation = playerDockingAnimation;
-        DockingExitAnimationDelay = dockingExitAnimationDelay;
+        this.dockingAnimation = dockingAnimation;
+        this.dockingLoopAnimation = dockingLoopAnimation;
+        this.launchLeftAnimation = launchLeftAnimation;
+        this.launchRightAnimation = launchRightAnimation;
+        this.playerDockingAnimation = playerDockingAnimation;
+        this.dockingExitAnimationDelay = dockingExitAnimationDelay;
 
-        OverrideController = new AnimatorOverrideController();
+        overrideController = new AnimatorOverrideController();
         return this;
     }
 
@@ -107,6 +111,4 @@ public class DockingHandler : HandlerComponent
             enabled = true;
         }
     }
-
-    public DockingHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
 }

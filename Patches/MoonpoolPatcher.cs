@@ -29,6 +29,12 @@ public class MoonpoolPatcher
             __result = true;
         }
     }
+
+    [HarmonyPostfix, HarmonyPatch(nameof(VehicleDockingBay.UpdateDockedPosition))]
+    static void SetRigidbodyKinematics(Dockable dockable, float interpfraction)
+    {
+        dockable.vehicle.useRigidbody.isKinematic = interpfraction < 1;
+    }
     
     /**
      * During docking procedure, an animation is played for the prawn suit and SeatTuck only
@@ -61,7 +67,7 @@ public class MoonpoolPatcher
             }
         } else
         {
-            var customDockable = vehicle.GetComponent<DockingHandler>();
+            var customDockable = vehicle.Prefab.GetComponent<DockingHandler>();
             
             if (!isVehicleOverrideActive)
             {
@@ -80,10 +86,10 @@ public class MoonpoolPatcher
 
                 var clipOverrides = new List<KeyValuePair<AnimationClip, AnimationClip>>
                 {
-                    new(dockingAnimation, customDockable.DockingAnimation),
-                    new(dockingLoopAnimation, customDockable.DockingLoopAnimation),
-                    new(launchLeftAnimation, customDockable.LaunchLeftAnimation),
-                    new(launchRightAnimation, customDockable.LaunchRightAnimation),
+                    new(dockingAnimation, customDockable.dockingAnimation),
+                    new(dockingLoopAnimation, customDockable.dockingLoopAnimation),
+                    new(launchLeftAnimation, customDockable.launchLeftAnimation),
+                    new(launchRightAnimation, customDockable.launchRightAnimation),
                 };
         
                 overrideController.ApplyOverrides(clipOverrides);
@@ -103,7 +109,7 @@ public class MoonpoolPatcher
 
                 var clipOverrides = new List<KeyValuePair<AnimationClip, AnimationClip>>
                 {
-                    new(playerSeatruckMoonpoolDockAnimation, customDockable.PlayerDockingAnimation),
+                    new(playerSeatruckMoonpoolDockAnimation, customDockable.playerDockingAnimation),
                 };
                 
                 overrideController.ApplyOverrides(clipOverrides);
@@ -116,13 +122,13 @@ public class MoonpoolPatcher
     {
         if (____dockedObject && Plugin.RegisteredVehicles.TryGetValue(GetTechType(____dockedObject.gameObject), out var vehicle))
         {
-            var dockingHandler = vehicle.GetComponent<DockingHandler>();
+            var dockingHandler = vehicle.Prefab.GetComponent<DockingHandler>();
             if (dockingHandler == null) return;
             
             SafeAnimator.SetBool(___animator, "seamoth_docked", ___docked_param);
             if (__instance.dockPlayerCinematic.cinematicModeActive)
             {
-                __instance.dockPlayerCinematic.endTransform = dockingHandler.DockingCinematicExitSide == DockingHandler.DockingExitSide.Left ? DockExitLeft : DockExitRight;
+                __instance.dockPlayerCinematic.endTransform = dockingHandler.dockingCinematicExitSide == DockingHandler.DockingExitSide.Left ? DockExitLeft : DockExitRight;
             }
         }
         else
@@ -142,9 +148,9 @@ public class MoonpoolPatcher
     {
         if (!Plugin.RegisteredVehicles.TryGetValue(GetTechType(dockable.gameObject), out var vehicle)) return true;
         
-        var customDockable = vehicle.GetComponent<DockingHandler>();
+        var customDockable = vehicle.Prefab.GetComponent<DockingHandler>();
         var originalPosition = ___dockingEndPos.localPosition;
-        ___dockingEndPos.localPosition = customDockable.DockingEndPoint;
+        ___dockingEndPos.localPosition = customDockable.dockingEndPoint;
         dockable.transform.position = Vector3.Lerp(___startPosition, ___dockingEndPos.position, interpfraction);
         dockable.transform.rotation = Quaternion.Lerp(___startRotation, ___dockingEndPos.rotation, interpfraction);
         ___dockingEndPos.localPosition = originalPosition;

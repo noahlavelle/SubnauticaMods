@@ -1,28 +1,35 @@
-﻿namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
+﻿using UnityEngine.Serialization;
+
+namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 public class EnergyHandler : HandlerComponent
 {
-    private EnergyMixin _energyMixin;
-    private EnergyInterface _energyInterface;
+    public EnergyMixin energyMixin;
     
-    public override void Instantiate()
+    [SerializeField] private Transform _batterySlotParent;
+    
+    public void Awake()
     {
-        _energyMixin = parentVehicle.Model.AddComponent<EnergyMixin>();
-        _energyMixin.defaultBattery = TechType.PowerCell;
-        _energyMixin.compatibleBatteries = new List<TechType> {TechType.PowerCell};
+        var energyInterface = gameObject.AddComponent<EnergyInterface>();
+        energyInterface.sources = new[] {energyMixin};
 
-        _energyInterface = parentVehicle.Model.AddComponent<EnergyInterface>();
-        _energyInterface.sources = new[] {_energyMixin};
+        VehicleBehaviour.energyInterface = energyInterface;
+    }
 
-        parentVehicle.Behaviour.energyInterface = _energyInterface;
+    public EnergyHandler WithEnergyConfig(TechType batteryType)
+    {
+        energyMixin = gameObject.AddComponent<EnergyMixin>();
+        energyMixin.defaultBattery = batteryType;
+        energyMixin.compatibleBatteries = new List<TechType> {batteryType};
+        energyMixin.storageRoot = _batterySlotParent.gameObject.AddComponent<ChildObjectIdentifier>();
+        
+        return this;
     }
 
     public EnergyHandler WithBatterySlot(Transform batterySlotParent)
     {
-        _energyMixin.storageRoot = batterySlotParent.gameObject.AddComponent<ChildObjectIdentifier>();
+        _batterySlotParent = batterySlotParent;
         
         return this;
     }
-    
-    public EnergyHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
 }

@@ -1,40 +1,52 @@
-﻿namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
+﻿using UnityEngine.Serialization;
+
+namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 public class HealthHandler : HandlerComponent
 {
-    public LiveMixin LiveMixin;
-    private LiveMixinData _liveMixinData;
-    private TemperatureDamage _temperatureDamage;
+    public LiveMixin liveMixin;
+    
+    [SerializeField] private LiveMixinData _liveMixinData;
+    [SerializeField] private float _health;
+    [SerializeField] private float _temperatureDamageAmount;
+    [SerializeField] private float _minDamageTemperature;
+    [SerializeField] private float _baseDamagePerSecond;
+    [SerializeField] private bool _onlyLavaDamage;
 
-    public override void Instantiate()
+    public void Awake()
     {
-        LiveMixin = parentVehicle.Model.AddComponent<LiveMixin>();
-        _temperatureDamage = parentVehicle.Model.AddComponent<TemperatureDamage>();
+        liveMixin = gameObject.AddComponent<LiveMixin>();
+        liveMixin.health = _health;
+        liveMixin.tempDamage = _temperatureDamageAmount;
+        liveMixin.data = _liveMixinData;
+        
+        var temperatureDamage = gameObject.AddComponent<TemperatureDamage>();
+        temperatureDamage.minDamageTemperature = _minDamageTemperature;
+        temperatureDamage.baseDamagePerSecond = _baseDamagePerSecond;
+        temperatureDamage.onlyLavaDamage = _onlyLavaDamage;
+        
+        temperatureDamage.liveMixin = liveMixin;
 
-        parentVehicle.Behaviour.liveMixin = LiveMixin;
-        _temperatureDamage.liveMixin = LiveMixin;
+        VehicleBehaviour.liveMixin = liveMixin;
+        
     }
 
     public HealthHandler WithConfig(
         float health, float temperatureDamage, float temperatureDamageMinimum, float temperatureDps, bool onlyLavaDamage, bool repairable, bool broadcastKillOnDeath
         )
     {
-        LiveMixin.health = health;
-        LiveMixin.tempDamage = temperatureDamage;
+        _health = health;
+        _temperatureDamageAmount = temperatureDamage;
 
         _liveMixinData = ScriptableObject.CreateInstance<LiveMixinData>();
         _liveMixinData.broadcastKillOnDeath = broadcastKillOnDeath;
         _liveMixinData.weldable = repairable;
         _liveMixinData.maxHealth = health;
 
-        LiveMixin.data = _liveMixinData;
-
-        _temperatureDamage.minDamageTemperature = temperatureDamageMinimum;
-        _temperatureDamage.baseDamagePerSecond = temperatureDps;
-        _temperatureDamage.onlyLavaDamage = onlyLavaDamage;
+        _minDamageTemperature = temperatureDamageMinimum;
+        _baseDamagePerSecond = temperatureDps;
+        _onlyLavaDamage = onlyLavaDamage;
 
         return this;
     }
-    
-    public HealthHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
 }

@@ -2,33 +2,33 @@
 
 public class PingHandler : HandlerComponent
 {
+    [SerializeField] private Transform _origin;
+    [SerializeField] private PingType _type;
     private PingInstance _ping;
-    private PingType _pingType;
-    
-    public override void Instantiate()
+
+    public void Awake()
     {
-        _ping = parentVehicle.Model.AddComponent<PingInstance>();
+        Plugin.Logger.LogInfo(_origin);
+        _ping = gameObject.AddComponent<PingInstance>();
+        _ping.pingType = _type;
+        _ping.origin = _origin;
     }
 
     public PingHandler WithOrigin(Transform origin)
     {
-        _ping.origin = origin;
+        _origin = origin;
         return this;
     }
 
-    public PingHandler WithIcon(Sprite icon)
+    public PingHandler WithIcon(Sprite icon, string classID)
     {
-        _pingType = EnumHandler.AddEntry<PingType>(parentVehicle.ClassID).WithIcon(icon);
-        _ping.pingType = _pingType;
+        _type = EnumHandler.AddEntry<PingType>(classID).WithIcon(icon);
         return this;
     }
 
-    public PingHandler WithName(string displayName)
+    public PingHandler WithName(string displayName, string classID)
     {
-        LanguageHandler.SetLanguageLine($"Ping{parentVehicle.ClassID}", displayName);
+        LanguageHandler.SetLanguageLine($"Ping{classID}", displayName);
         return this;
     }
-
-    public PingHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle)
-    { }
 }

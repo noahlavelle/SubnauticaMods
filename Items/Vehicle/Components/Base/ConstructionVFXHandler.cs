@@ -5,9 +5,7 @@ namespace VehicleFrameworkNautilus.Items.Vehicle.Components.Base;
 
 public class ConstructionVFXHandler : HandlerComponent
 {
-    public ConstructionVFXHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
-    
-    public override void Instantiate()
+    public void Awake()
     {
         var referenceVFX = VehicleHelper.ReferenceVehicle.GetComponent<VFXConstructing>();
 

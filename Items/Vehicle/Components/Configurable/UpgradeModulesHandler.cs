@@ -2,37 +2,57 @@
 
 public class UpgradeModulesHandler : HandlerComponent
 {
-    private VehicleUpgradeConsoleInput _upgradeConsoleInput;
-    private ChildObjectIdentifier _upgradeConsoleRootIdentifier;
-    
-    public override void Instantiate() { }
+    [SerializeField] private Transform _console;
+    [SerializeField] private Transform _consoleRoot;
+    [SerializeField] private Transform _flap;
+    [SerializeField] private FMODAsset _openSound;
+    [SerializeField] private FMODAsset _closeSound;
+
+    public void Awake()
+    {
+        VehicleBehaviour.upgradesInput.animator = VehicleBehaviour.GetComponentInChildren<Animator>();
+        VehicleBehaviour.upgradesInput.collider = VehicleBehaviour.upgradesInput.GetComponent<Collider>(); 
+
+        VehicleBehaviour.upgradesInput.dockType = global::Vehicle.DockType.Base;
+        VehicleBehaviour.upgradesInput.interactText = "UpgradeConsole";
+        VehicleBehaviour.upgradesInput.flap = _flap.transform;
+        VehicleBehaviour.upgradesInput.animatorParamOpen = "";
+        VehicleBehaviour.upgradesInput.anglesOpened = new Vector3(-180, -90, 90);
+        VehicleBehaviour.upgradesInput.anglesClosed = new Vector3(-90, -90, 90);
+        VehicleBehaviour.upgradesInput.openSound = _openSound;
+        VehicleBehaviour.upgradesInput.closeSound = _closeSound;
+        
+
+    }
 
     public UpgradeModulesHandler WithUpgradeConsole(Transform console, Transform consoleRoot, Transform flap)
     {
-        _upgradeConsoleInput = console.gameObject.AddComponent<VehicleUpgradeConsoleInput>();
-        _upgradeConsoleRootIdentifier = consoleRoot.gameObject.AddComponent<ChildObjectIdentifier>();
-
-        _upgradeConsoleInput.animator = parentVehicle.Model.GetComponentInChildren<Animator>();
-        _upgradeConsoleInput.collider = _upgradeConsoleInput.GetComponent<Collider>();
-        _upgradeConsoleInput.dockType = global::Vehicle.DockType.Base;
-        _upgradeConsoleInput.interactText = "UpgradeConsole";
-        _upgradeConsoleInput.flap = flap.transform;
-        _upgradeConsoleInput.animatorParamOpen = "";
-        _upgradeConsoleInput.anglesOpened = new Vector3(-180, -90, 90);
-        _upgradeConsoleInput.anglesClosed = new Vector3(-90, -90, 90);
+        _console = console;
+        _consoleRoot = consoleRoot;
+        _flap = flap;
         
-        parentVehicle.Behaviour.modulesRoot = _upgradeConsoleRootIdentifier;
-        parentVehicle.Behaviour.upgradesInput = _upgradeConsoleInput;
+        var upgradeConsoleInput = _console.gameObject.AddComponent<VehicleUpgradeConsoleInput>();
+        var upgradeConsoleRootIdentifier = _consoleRoot.gameObject.AddComponent<ChildObjectIdentifier>();
+        
+        upgradeConsoleInput.slots = new[]
+        {
+            new VehicleUpgradeConsoleInput.Slot(),
+            new VehicleUpgradeConsoleInput.Slot(),
+            new VehicleUpgradeConsoleInput.Slot(),
+            new VehicleUpgradeConsoleInput.Slot()
+        };
+        
+        VehicleBehaviour.modulesRoot = upgradeConsoleRootIdentifier;
+        VehicleBehaviour.upgradesInput = upgradeConsoleInput;
+        
         return this;
     }
 
     public UpgradeModulesHandler WithSound(FMODAsset openSound, FMODAsset closeSound)
     {
-        _upgradeConsoleInput.openSound = openSound;
-        _upgradeConsoleInput.closeSound = closeSound;
+        _openSound = openSound;
+        _closeSound = closeSound;
 
         return this;
     }
-    
-    public UpgradeModulesHandler(BaseVehiclePrefab parentVehicle) : base(parentVehicle) { }
 }

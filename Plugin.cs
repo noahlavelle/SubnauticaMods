@@ -32,7 +32,7 @@ public class Plugin : BaseUnityPlugin
     public static string ModFolderPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     public static AssetBundle AssetBundle;
 
-    public static readonly Dictionary<TechType, BaseVehiclePrefab> RegisteredVehicles = new();
+    public static readonly Dictionary<TechType, BaseVehicleHandler> RegisteredVehicles = new();
 
     private void Awake()
     {
@@ -47,18 +47,19 @@ public class Plugin : BaseUnityPlugin
         yield return VehicleHelper.LoadReferenceVehicleAsync();
 
         Harmony.PatchAll();
-        new SeaMoth().Register();
+        var seaMoth = new SeaMoth();
+        seaMoth.Register();
         
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
     }
 }
 
-public class SeaMoth : BaseVehiclePrefab
+public class SeaMoth : BaseVehicleHandler
 {
     public override string ClassID => "seamothmod";
     public override string DisplayName => "Alterra Seamoth";
     public override string Description => "Desc";
-    public override float CraftTime => 5f;
+    public override float CraftTime => 13f;
     public override Sprite CraftIcon => null;
 
     public override RecipeData Recipe => new()
@@ -70,44 +71,45 @@ public class SeaMoth : BaseVehiclePrefab
         }
     };
 
-    public override GameObject Model => Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab.prefab");
+    public override GameObject Prefab => Plugin.AssetBundle.LoadAsset<GameObject>("SeamothPrefab.prefab");
 
-    protected override void ConfigureVehicle()
+    public override void Register()
     { 
-        AddBehaviour<SeaMothBehaviour>();
+        SetBehaviour<SeaMothBehaviour>();
         
-        base.ConfigureVehicle();
-
-        Model.ApplyAlterraVehicleMaterial();
+        base.Register();
+        
+        Prefab.ApplyAlterraVehicleMaterial();
 
         PhysicsHandler
             .WithPhysicsConfig(
                 new PhysicsHandlerConfig(800, 2, 4, 0, 9.81f, -5f, 4, 2, true, false
                 ))
-            .WithCollision(Model.transform.Find("Collision").gameObject);
+            .WithCollision(Prefab.transform.Find("Collision").gameObject);
 
         PingHandler
-            .WithOrigin(Model.transform.Find("PingOrigin"))
-            .WithIcon(Plugin.AssetBundle.LoadAsset<Sprite>("SeamothPingIcon"))
-            .WithName("Seamoth");
+            .WithOrigin(Prefab.transform.Find("PingOrigin"))
+            .WithIcon(Plugin.AssetBundle.LoadAsset<Sprite>("SeamothPingIcon"), ClassID)
+            .WithName("Seamoth", ClassID);
 
         UpgradeModulesHandler
             .WithUpgradeConsole(
-                Model.transform.Find("UpgradeConsole"), Model.transform.Find("Model/Vehicle_Anim/UpgradeSlot_Hatch_geo"), Model.transform.Find("UpgradeModulesRoot"))
+                Prefab.transform.Find("UpgradeConsole"), Prefab.transform.Find("Model/Vehicle_Anim/UpgradeSlot_Hatch_geo"), Prefab.transform.Find("UpgradeModulesRoot"))
             .WithSound(AssetHelper.StorageOpenSound, AssetHelper.StorageCloseSound);
 
         EnergyHandler
-            .WithBatterySlot(Model.transform.Find("BatterySlot"));
+            .WithBatterySlot(Prefab.transform.Find("BatterySlot"))
+            .WithEnergyConfig(TechType.PowerCell);
 
         PositionHandler
             .WithPositions(
-                Model.transform.Find("Model/Vehicle_Anim/Joints/AttachJoint/CameraPivot"),
-                Model.transform.Find("EndPosition"),
-                Model.transform.Find(
+                Prefab.transform.Find("Model/Vehicle_Anim/Joints/AttachJoint/CameraPivot"),
+                Prefab.transform.Find("EndPosition"),
+                Prefab.transform.Find(
                     "Model/Vehicle_Anim/Joints/Wheel_Base/Wheel_Segment_1/Wheel_Segment_2/Wheel_Head/LeftIKTarget"),
-                Model.transform.Find(
+                Prefab.transform.Find(
                     "Model/Vehicle_Anim/Joints/Wheel_Base/Wheel_Segment_1/Wheel_Segment_2/Wheel_Head/RightIKTarget"),
-                Model.transform.Find(
+                Prefab.transform.Find(
                     "AlternateExits")
             );
 
@@ -128,9 +130,9 @@ public class SeaMoth : BaseVehiclePrefab
 
         CrushDepthHandler
             .WithConfig(200, 20, 3)
-            .WithSound(Model.transform.Find("crushDamageSound").gameObject, AssetHelper.CrushDamage, AssetHelper.SeamothDepthWarning);
+            .WithSound(Prefab.transform.Find("crushDamageSound").gameObject, AssetHelper.CrushDamageSound, AssetHelper.SeamothDepthWarning);
 
-        AddComponent<DockingHandler>()
+        AddHandler<DockingHandler>()
             .WithPositions(new Vector3(0, 0, 0), DockingHandler.DockingExitSide.Left)
             .WithAnimations(Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_dock"),
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("loop_seamoth_docked"),
@@ -138,6 +140,11 @@ public class SeaMoth : BaseVehiclePrefab
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("seamoth_launch_right"),
                 Plugin.AssetBundle.LoadAsset<AnimationClip>("player_view_moon_seamoth_dock"),
                 3f);
+
+        AddHandler<LightHandler>()
+            .WithLightingParent(Prefab.transform.Find("Lighting"))
+            .WithEnergyHandler(EnergyHandler)
+            .WithSound(AssetHelper.LightOnSound, AssetHelper.LightOffSound);
     }
 }
 
