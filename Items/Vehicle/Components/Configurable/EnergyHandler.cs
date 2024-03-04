@@ -13,7 +13,7 @@ public class EnergyHandler : HandlerComponent
         var energyInterface = gameObject.AddComponent<EnergyInterface>();
         energyInterface.sources = new[] {energyMixin};
 
-        VehicleBehaviour.energyInterface = energyInterface;
+        VehicleBehaviourHandler.energyInterface = energyInterface;
     }
 
     public EnergyHandler WithEnergyConfig(TechType batteryType)

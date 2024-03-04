@@ -27,7 +27,7 @@ public class HealthHandler : HandlerComponent
         
         temperatureDamage.liveMixin = liveMixin;
 
-        VehicleBehaviour.liveMixin = liveMixin;
+        VehicleBehaviourHandler.liveMixin = liveMixin;
         
     }
 

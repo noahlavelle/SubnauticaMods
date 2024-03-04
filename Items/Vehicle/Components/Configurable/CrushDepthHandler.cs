@@ -14,7 +14,7 @@ public class CrushDepthHandler : HandlerComponent
         var crushDamage = gameObject.AddComponent<CrushDamage>();
         crushDamage.soundOnDamage = _crushDamageEmitter;
         crushDamage.liveMixin = gameObject.GetComponent<HealthHandler>().liveMixin;
-        crushDamage.vehicle = VehicleBehaviour;
+        crushDamage.vehicle = VehicleBehaviourHandler;
         crushDamage.kBaseCrushDepth = _kBaseCrushDepth;
         crushDamage.damagePerCrush = _damagePerCrush;
         crushDamage.crushPeriod = _crushPeriod;
@@ -30,8 +30,8 @@ public class CrushDepthHandler : HandlerComponent
         depthAlarms.crushDepthNotification = crushDamageNotification;
         depthAlarms.conditionRules = depthAlarmsConditionRules;
 
-        VehicleBehaviour.crushDamage = crushDamage;
-        VehicleBehaviour.depthAlarms = depthAlarms;
+        VehicleBehaviourHandler.crushDamage = crushDamage;
+        VehicleBehaviourHandler.depthAlarms = depthAlarms;
     }
 
     public CrushDepthHandler WithSound(GameObject audioParent, FMODAsset crushAsset, FMODAsset warningAsset)

@@ -13,25 +13,25 @@ public class PositionHandler : HandlerComponent
     public void Awake()
     {
         var movePlayer = gameObject.AddComponent<MovePlayer>();
-        VehicleBehaviour.movePlayerComp = movePlayer;
+        VehicleBehaviourHandler.movePlayerComp = movePlayer;
         movePlayer.from = _sitPosition;
         movePlayer.to = _exitPosition;
         movePlayer.followTransformMovement = false;
         
-        VehicleBehaviour.playerPosition = _sitPosition.gameObject;
-        VehicleBehaviour.playerSits = true;
-        VehicleBehaviour.leftHandPlug = _leftHandTarget;
-        VehicleBehaviour.rightHandPlug = _rightHandTarget;
+        VehicleBehaviourHandler.playerPosition = _sitPosition.gameObject;
+        VehicleBehaviourHandler.playerSits = true;
+        VehicleBehaviourHandler.leftHandPlug = _leftHandTarget;
+        VehicleBehaviourHandler.rightHandPlug = _rightHandTarget;
 
-        VehicleBehaviour.altExitPositions = new Transform[_altPositionsParent.childCount];
+        VehicleBehaviourHandler.altExitPositions = new Transform[_altPositionsParent.childCount];
         foreach (Transform child in _altPositionsParent)
         {
-            VehicleBehaviour.altExitPositions.Add(child);
+            VehicleBehaviourHandler.altExitPositions.Add(child);
         }
         
-        VehicleBehaviour.exitPosLand = _exitPosition;
-        VehicleBehaviour.exitPosWater = _exitPosition;
-        VehicleBehaviour.movePlayerComp = movePlayer;
+        VehicleBehaviourHandler.exitPosLand = _exitPosition;
+        VehicleBehaviourHandler.exitPosWater = _exitPosition;
+        VehicleBehaviourHandler.movePlayerComp = movePlayer;
     }
 
     public PositionHandler WithPositions(Transform sitPosition, Transform exitPosition, Transform leftHandTarget, Transform rightHandTarget, Transform altPositionsParent)

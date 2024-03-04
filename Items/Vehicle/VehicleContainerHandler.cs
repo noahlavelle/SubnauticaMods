@@ -6,14 +6,14 @@ using VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 namespace VehicleFrameworkNautilus.Items.Vehicle;
 
-public abstract class BaseVehicleHandler
+public abstract class VehicleContainerHandler : RegisteredItemHandler
 {
     // private readonly List<HandlerComponent> _components = new();
 
     /// <summary>
     /// Registers the vehicle as a craftable prefab
     /// </summary>
-    public virtual void Register()
+    public override void Register()
     {
         Info = PrefabInfo
             .WithTechType(ClassID, DisplayName, Description)
@@ -29,6 +29,10 @@ public abstract class BaseVehicleHandler
         customPrefab.Register();
         
         Plugin.RegisteredVehicles.Add(Info.TechType, this);
+        
+        // Upgrade Modules Crafting
+        CraftTreeHandler.AddTabNode(ModulesFabricatorType, ModulesNodeTabID,  ModulesNodeName, CraftIcon, "Upgrades");
+        ModulesEquipmentType = EnumHandler.AddEntry<EquipmentType>(ModulesEquipmentTypeName);
     }
 
     /// <summary>
@@ -43,7 +47,7 @@ public abstract class BaseVehicleHandler
     private void ApplyCoreComponents()
     {
         ConstructionVFXHandler = AddHandler<ConstructionVFXHandler>();
-        UpgradeModulesHandler = AddHandler<UpgradeModulesHandler>();
+        UpgradeModulesInputHandler = AddHandler<UpgradeModulesInputHandler>();
         PhysicsHandler = AddHandler<PhysicsHandler>();
         PingHandler = AddHandler<PingHandler>();
         EnergyHandler = AddHandler<EnergyHandler>();
@@ -69,32 +73,20 @@ public abstract class BaseVehicleHandler
     }
 
     public T SetBehaviour<T>()
-        where T : BaseVehicleBehaviour
+        where T : VehicleBehaviourHandler
     {
         var behaviour = Prefab.AddComponent<T>();
-        Behaviour = behaviour;
+        BehaviourHandler = behaviour;
         
         return behaviour;
     }
-
-    /* Prefab Settings */
-    public abstract string ClassID { get; }
-    public abstract string DisplayName { get; }
-    public abstract string Description { get; }
-    public PrefabInfo Info { get; private set; }
     
-    /* Crafting Settings */
-    public abstract RecipeData Recipe { get; }
-    public abstract float CraftTime { get; }
-    public abstract Sprite CraftIcon { get;  }
-    /* Vehicle Data */
-    public abstract GameObject Prefab { get; }
-    public BaseVehicleBehaviour Behaviour { get; private set; }
+    public VehicleBehaviourHandler BehaviourHandler { get; private set; }
     
     /* Essential Components */
 
     public ConstructionVFXHandler ConstructionVFXHandler { get; private set; }
-    public UpgradeModulesHandler UpgradeModulesHandler { get; private set; }
+    public UpgradeModulesInputHandler UpgradeModulesInputHandler { get; private set; }
     public PhysicsHandler PhysicsHandler { get; private set; }
     public PingHandler PingHandler { get; private set; }
     public EnergyHandler EnergyHandler { get; private set; }
@@ -103,4 +95,13 @@ public abstract class BaseVehicleHandler
     public SoundHandler SoundHandler { get; private set; }
     public HealthHandler HealthHandler { get; private set; }
     public CrushDepthHandler CrushDepthHandler { get; private set; }
+    
+    // Upgrade Modules
+    public abstract CraftTree.Type ModulesFabricatorType { get; }
+    public abstract string ModulesNodeTabID { get; }
+    protected abstract string ModulesNodeName { get; }
+    protected abstract string ModulesEquipmentTypeName { get;  }
+    
+    public EquipmentType ModulesEquipmentType { get; protected set; }
+    
 }

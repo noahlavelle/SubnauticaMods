@@ -4,7 +4,7 @@ using VehicleFrameworkNautilus.Items.Vehicle.Components;
 
 namespace VehicleFrameworkNautilus.Items.Vehicle;
 
-public abstract class BaseVehicleBehaviour : global::Vehicle, IInteriorSpace, IHandTarget
+public abstract class VehicleBehaviourHandler : global::Vehicle, IInteriorSpace, IHandTarget
 {
     private static readonly int DockedAnimation = Animator.StringToHash("docked");
     

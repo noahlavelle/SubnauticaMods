@@ -21,7 +21,7 @@ public class PhysicsHandler : HandlerComponent
         var constructionObstacle = gameObject.AddComponent<ConstructionObstacle>();
         constructionObstacle.reason = "VehicleObstacle";
         
-        VehicleBehaviour.collisionModel = collisionParent;
+        VehicleBehaviourHandler.collisionModel = collisionParent;
     }
 
     public PhysicsHandler WithCollision(GameObject collisionParent)
@@ -48,8 +48,8 @@ public class PhysicsHandler : HandlerComponent
         worldForces.waterDepth = _config.WaterDepth;
         worldForces.useRigidbody = rigidbody;
         
-        VehicleBehaviour.useRigidbody = rigidbody;
-        VehicleBehaviour.worldForces = worldForces;
+        VehicleBehaviourHandler.useRigidbody = rigidbody;
+        VehicleBehaviourHandler.worldForces = worldForces;
         
         return this;
     }

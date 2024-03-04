@@ -33,8 +33,8 @@ public class DockingHandler : HandlerComponent
     {
         var dockable = gameObject.AddComponent<Dockable>();
         dockable.rb = gameObject.GetComponent<PhysicsHandler>().rigidbody;
-        dockable.vehicle = VehicleBehaviour;
-        VehicleBehaviour.dockable = dockable;
+        dockable.vehicle = VehicleBehaviourHandler;
+        VehicleBehaviourHandler.dockable = dockable;
 
         _colorCustomizer = gameObject.AddComponent<ColorCustomizer>();
         _colorCustomizer.isBase = false;

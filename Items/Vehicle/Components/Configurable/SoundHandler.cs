@@ -21,8 +21,8 @@ public class SoundHandler : HandlerComponent
         soundOnDamage.sound = _damageSound;
         soundOnDamage.damageType = DamageType.Collide;
         
-        VehicleBehaviour.welcomeNotification = enterNotification;
-        VehicleBehaviour.splashSound = _splashSound;
+        VehicleBehaviourHandler.welcomeNotification = enterNotification;
+        VehicleBehaviourHandler.splashSound = _splashSound;
     }
 
     public SoundHandler WithSounds(FMODAsset welcomeSound, FMODAsset damageSound, FMODAsset splashSound, FMODAsset revUpSound, FMODAsset revLoopSound, string welcomeText)
@@ -54,7 +54,7 @@ public class SoundHandler : HandlerComponent
     public void Update()
     {
         var vector = AvatarInputHandler.main.IsEnabled() ? GameInput.GetMoveDirection() : Vector3.zero;
-        if (VehicleBehaviour.CanPilot() && vector.magnitude > 0f && VehicleBehaviour.GetPilotingMode())
+        if (VehicleBehaviourHandler.CanPilot() && vector.magnitude > 0f && VehicleBehaviourHandler.GetPilotingMode())
         {
             _engineRpmSfxManager.AccelerateInput();
         }

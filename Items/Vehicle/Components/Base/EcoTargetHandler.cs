@@ -12,6 +12,6 @@ public class EcoTargetHandler : HandlerComponent
         creatureUtils.setupEcoBehaviours = false;
         creatureUtils.addedComponents = new Component[] {ecoTarget};
 
-        VehicleBehaviour.ecoTarget = ecoTarget;
+        VehicleBehaviourHandler.ecoTarget = ecoTarget;
     }
 }

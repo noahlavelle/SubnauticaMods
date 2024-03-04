@@ -2,18 +2,18 @@
 
 public abstract class HandlerComponent : MonoBehaviour
 {
-    private BaseVehicleBehaviour _vehicleBehaviour;
+    private VehicleBehaviourHandler _vehicleBehaviourHandler;
 
-    protected BaseVehicleBehaviour VehicleBehaviour
+    protected VehicleBehaviourHandler VehicleBehaviourHandler
     {
         get
         {
-            if (_vehicleBehaviour == null)
+            if (_vehicleBehaviourHandler == null)
             {
-                _vehicleBehaviour = gameObject.GetComponent<BaseVehicleBehaviour>();
+                _vehicleBehaviourHandler = gameObject.GetComponent<VehicleBehaviourHandler>();
             }
 
-            return _vehicleBehaviour;
+            return _vehicleBehaviourHandler;
         }
     }
 }
