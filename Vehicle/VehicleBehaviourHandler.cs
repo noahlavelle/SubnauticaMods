@@ -1,6 +1,7 @@
 ﻿using mset;
 using UnityEngine.Events;
 using VehicleFrameworkNautilus.Items.Vehicle.Components;
+using VehicleFrameworkNautilus.Items.Vehicle.Components.Configurable;
 
 namespace VehicleFrameworkNautilus.Items.Vehicle;
 
@@ -78,6 +79,13 @@ public abstract class VehicleBehaviourHandler : global::Vehicle, IInteriorSpace,
         {
             movePlayerComp.BeginMove();
         }
+    }
+
+    public void GetHUDValues(out int health, out int power, out float temperature)
+    {
+        health = Mathf.CeilToInt(liveMixin.health / liveMixin.data.maxHealth * 100f);
+        power = Mathf.Max(Mathf.CeilToInt(GetComponent<EnergyMixin>().energy * 100f), 0);
+        temperature = GetTemperature();
     }
 
     public override bool CanPilot()
