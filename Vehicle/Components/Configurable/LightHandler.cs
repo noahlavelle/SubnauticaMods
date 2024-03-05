@@ -23,9 +23,6 @@ public class LightHandler : HandlerComponent
         _toggleLights.lightsOnSound.path = _onSound.path;
         _toggleLights.lightsOffSound.asset = _offSound;
         _toggleLights.lightsOffSound.path = _offSound.path;
-
-
-
     }
 
     public LightHandler WithLightingParent(Transform lightingParent)
@@ -52,6 +49,7 @@ public class LightHandler : HandlerComponent
 
     public void Update()
     {
-        _toggleLights.CheckLightToggle();
+        if (VehicleBehaviourHandler.GetPilotingMode())
+            _toggleLights.CheckLightToggle();
     }
 }
